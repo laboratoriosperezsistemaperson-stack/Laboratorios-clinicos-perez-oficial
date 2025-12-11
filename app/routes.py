@@ -93,7 +93,7 @@ def guardar_pdf_con_backup(archivo, numero_orden, paciente):
     Sube el PDF a Supabase Storage
     """
     try:
-        success, storage_path, error = pdf_manager.save_pdf(archivo, numero_orden)
+        success, storage_path, error = pdf_manager.save_pdf(archivo, numero_orden, paciente)
         
         if success:
             print(f"✓ PDF subido a Supabase: {storage_path}")

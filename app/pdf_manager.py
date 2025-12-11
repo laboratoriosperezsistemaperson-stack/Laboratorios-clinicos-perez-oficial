@@ -26,11 +26,10 @@ class PDFManager:
         unique_id = secrets.token_hex(4)
         return f"{numero_orden}_{name_without_ext}_{timestamp}_{unique_id}.pdf"
     
-    def save_pdf(self, file, numero_orden, paciente_folder=None):
+    def save_pdf(self, file, numero_orden, paciente=None):
         """
         Sube el PDF a Supabase Storage.
-        paciente_folder se ignora porque Supabase usa estructura plana o carpetas virtuales.
-        Usaremos una carpeta virtual por año/mes para organizar mejor.
+        Organiza archivos en carpetas por paciente: 'pacientes/CI_Nombre/filename.pdf'
         """
         if not file or file.filename == '':
             return False, None, "No se seleccionó ningún archivo"
@@ -42,15 +41,20 @@ class PDFManager:
 
         try:
             filename = self.generate_filename(numero_orden, file.filename)
-            # Organizar por Año/Mes para no tener miles de archivos en root
-            folder = datetime.now().strftime('%Y/%m')
-            storage_path = f"{folder}/{filename}"
+            
+            # Definir carpeta de destino
+            if paciente:
+                folder_name = secure_filename(f"{paciente.ci}_{paciente.nombre}")
+                storage_path = f"pacientes/{folder_name}/{filename}"
+            else:
+                # Fallback si no hay paciente (no debería pasar normalmente)
+                folder = datetime.now().strftime('%Y/%m')
+                storage_path = f"{folder}/{filename}"
             
             # Leer contenido del archivo
             file_content = file.read()
             
             # Subir a Supabase
-            # file_options={"content-type": "application/pdf"}
             res = self.supabase.storage.from_(self.bucket_name).upload(
                 path=storage_path,
                 file=file_content,
