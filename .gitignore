@@ -20,3 +20,5 @@ migrate_to_supabase.py
 fix_supabase_schema.py
 clean_duplicates.py
 delete_duplicate_tables.py
+app/static/uploads/
+!app/static/uploads/.gitkeep

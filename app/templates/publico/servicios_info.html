@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+{% block title %}Información - Laboratorio Pérez{% endblock %}
+{% block content %}
+<style>
+    :root {
+        --fb-green: #1ABC9C;
+        --fb-orange: #F39C12;
+        --fb-dark: #1c1e21;
+        --fb-gray: #65676b;
+        --fb-light: #f0f2f5;
+        --fb-card: #ffffff;
+        --fb-border: #dadde1;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    body {
+        background: var(--fb-light);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    /* COVER - ESTILO FACEBOOK */
+    .fb-cover {
+        width: 100%;
+        height: 420px;
+        position: relative;
+        overflow: hidden;
+        background: #f0f2f5;
+    }
+
+    .fb-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 20%;
+    }
+
+    /* Ajuste para pantallas grandes - mostrar más de la imagen */
+    @media (min-width: 1200px) {
+        .fb-cover {
+            height: 450px;
+        }
+
+        .fb-cover img {
+            object-position: center 18%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .fb-cover {
+            height: 350px;
+        }
+
+        .fb-cover img {
+            object-position: center 25%;
+        }
+    }
+
+    .fb-cover::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to top, var(--fb-card) 0%, transparent 100%);
+    }
+
+    .fb-header {
+        background: var(--fb-card);
+        border-bottom: 1px solid var(--fb-border);
+    }
+
+    .fb-header-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 25px;
+        margin-top: -80px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .fb-profile-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--fb-border);
+    }
+
+    .fb-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        border: 5px solid var(--fb-card);
+        overflow: hidden;
+        background: var(--fb-card);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        flex-shrink: 0;
+    }
+
+    .fb-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fb-info {
+        flex: 1;
+        padding-bottom: 10px;
+    }
+
+    .fb-name {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--fb-dark);
+        margin-bottom: 8px;
+    }
+
+    .fb-name span {
+        color: var(--fb-green);
+    }
+
+    .fb-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        color: var(--fb-gray);
+        font-size: 0.95rem;
+    }
+
+    .fb-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .fb-meta-item i {
+        color: var(--fb-green);
+    }
+
+    .fb-nav {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 25px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .fb-tab {
+        padding: 16px 18px;
+        color: var(--fb-gray);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .fb-tab:hover {
+        background: var(--fb-light);
+        color: var(--fb-green);
+    }
+
+    .fb-tab.active {
+        color: var(--fb-green);
+        border-bottom-color: var(--fb-green);
+    }
+
+    .fb-main {
+        max-width: 1000px;
+        margin: 25px auto;
+        padding: 0 25px 60px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .info-card {
+        background: var(--fb-card);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .info-card-header {
+        padding: 18px 20px;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: var(--fb-dark);
+        border-bottom: 1px solid var(--fb-border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, rgba(26, 188, 156, 0.05), rgba(243, 156, 18, 0.05));
+    }
+
+    .info-card-header i {
+        color: var(--fb-green);
+        font-size: 1.2rem;
+    }
+
+    .info-card-body {
+        padding: 15px 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--fb-border);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--fb-green), var(--fb-orange));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .info-text h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--fb-dark);
+        margin-bottom: 4px;
+    }
+
+    .info-text p {
+        font-size: 0.9rem;
+        color: var(--fb-gray);
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .info-text a {
+        color: var(--fb-green);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .service-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 15px;
+        background: var(--fb-light);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: all 0.2s;
+    }
+
+    .service-item:hover {
+        background: linear-gradient(135deg, rgba(26, 188, 156, 0.1), rgba(243, 156, 18, 0.1));
+        transform: translateX(5px);
+    }
+
+    .service-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--fb-green), var(--fb-orange));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .service-item h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--fb-dark);
+        margin-bottom: 3px;
+    }
+
+    .service-item p {
+        font-size: 0.85rem;
+        color: var(--fb-gray);
+        margin: 0;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        color: white;
+        transition: all 0.2s;
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .cta-whatsapp {
+        background: #25D366;
+    }
+
+    .cta-phone {
+        background: var(--fb-orange);
+    }
+
+    .cta-map {
+        background: var(--fb-green);
+    }
+
+    @media (max-width: 768px) {
+        .fb-cover {
+            height: 350px;
+        }
+
+        .fb-header-content {
+            margin-top: -60px;
+            padding: 0 10px;
+        }
+
+        .fb-profile-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .fb-avatar {
+            width: 130px;
+            height: 130px;
+        }
+
+        .fb-main {
+            padding: 0 10px 60px;
+        }
+
+        .fb-nav {
+            padding: 0 5px;
+            gap: 2px;
+        }
+
+        .fb-tab {
+            padding: 12px 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .fb-name {
+            font-size: 1.5rem;
+        }
+
+        .fb-meta {
+            flex-direction: column;
+            font-size: 0.85rem;
+            gap: 5px;
+            align-items: flex-start;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            padding: 0 5px;
+        }
+
+        .info-card {
+            margin: 0;
+        }
+    }
+</style>
+
+<div class="fb-cover" onclick="openCoverModal()" style="cursor: pointer;" title="Clic para ver imagen completa">
+    <img src="{{ url_for('static', filename='img/cerro_potosi.jpg') }}" alt="Cerro Rico" id="coverImage">
+</div>
+<div class="fb-header">
+    <div class="fb-header-content">
+        <div class="fb-profile-row">
+            <div class="fb-avatar"><img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo"></div>
+            <div class="fb-info">
+                <h1 class="fb-name">Laboratorio Clínico <span>Pérez</span></h1>
+                <div class="fb-meta">
+                    <span class="fb-meta-item"><i class="fas fa-microscope"></i> Laboratorio Clínico</span>
+                    <span class="fb-meta-item"><i class="fas fa-map-marker-alt"></i> Potosí, Bolivia</span>
+                    <span class="fb-meta-item"><i class="fas fa-star"></i> 4.9 ★</span>
+                </div>
+            </div>
+        </div>
+        <nav class="fb-nav">
+            <a href="{{ url_for('main.servicios') }}" class="fb-tab"><i class="fas fa-stream"></i> Publicaciones</a>
+            <a href="{{ url_for('main.servicios_info') }}" class="fb-tab active"><i class="fas fa-info-circle"></i>
+                Información</a>
+            <a href="{{ url_for('main.servicios_fotos') }}" class="fb-tab"><i class="fas fa-images"></i> Fotos</a>
+        </nav>
+    </div>
+</div>
+
+<div class="fb-main">
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-card-header"><i class="fas fa-address-book"></i> Contacto</div>
+            <div class="info-card-body">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-phone"></i></div>
+                    <div class="info-text">
+                        <h4>Teléfono</h4>
+                        <p><a href="tel:67619188">67619188</a></p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fab fa-whatsapp"></i></div>
+                    <div class="info-text">
+                        <h4>WhatsApp</h4>
+                        <p><a href="https://wa.me/59167619188">+591 67619188</a></p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="info-text">
+                        <h4>Email</h4>
+                        <p><a href="mailto:laboratorios.perez@gmail.com">laboratorios.perez@gmail.com</a></p>
+                    </div>
+                </div>
+                <div class="cta-buttons">
+                    <a href="https://wa.me/59167619188" class="cta-btn cta-whatsapp"><i class="fab fa-whatsapp"></i>
+                        WhatsApp</a>
+                    <a href="tel:67619188" class="cta-btn cta-phone"><i class="fas fa-phone"></i> Llamar</a>
+                </div>
+            </div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-header"><i class="fas fa-map-marker-alt"></i> Ubicación</div>
+            <div class="info-card-body">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-building"></i></div>
+                    <div class="info-text">
+                        <h4>Dirección</h4>
+                        <p>La Paz entre Matos y Hoyos 1137, Potosí</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-city"></i></div>
+                    <div class="info-text">
+                        <h4>Referencia</h4>
+                        <p>A una cuadra de la Plaza 10 de Noviembre</p>
+                    </div>
+                </div>
+                <div class="cta-buttons"><a
+                        href="https://www.google.com/maps/dir/?api=1&destination=-19.588398,-65.750749"
+                        class="cta-btn cta-map"><i class="fas fa-directions"></i> Cómo llegar</a></div>
+            </div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-header"><i class="fas fa-clock"></i> Horarios</div>
+            <div class="info-card-body">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="info-text">
+                        <h4>Lunes - Viernes</h4>
+                        <p>7:00 AM - 7:00 PM</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-calendar-day"></i></div>
+                    <div class="info-text">
+                        <h4>Sábado</h4>
+                        <p>7:00 AM - 1:00 PM</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-calendar-times"></i></div>
+                    <div class="info-text">
+                        <h4>Domingo</h4>
+                        <p>Cerrado</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-card">
+            <div class="info-card-header"><i class="fas fa-info-circle"></i> Acerca de</div>
+            <div class="info-card-body">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-award"></i></div>
+                    <div class="info-text">
+                        <h4>Experiencia</h4>
+                        <p>Más de 10 años brindando análisis clínicos de calidad en Potosí.</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-certificate"></i></div>
+                    <div class="info-text">
+                        <h4>Certificación</h4>
+                        <p>Personal y equipos certificados para resultados precisos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-card" style="grid-column: 1 / -1;">
+            <div class="info-card-header"><i class="fas fa-concierge-bell"></i> Servicios</div>
+            <div class="info-card-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fas fa-vial"></i></div>
+                        <div>
+                            <h4>Análisis Clínicos</h4>
+                            <p>Química sanguínea, hematología</p>
+                        </div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fas fa-dna"></i></div>
+                        <div>
+                            <h4>Pruebas de ADN</h4>
+                            <p>Paternidad y estudios genéticos</p>
+                        </div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fas fa-baby"></i></div>
+                        <div>
+                            <h4>Pruebas de Embarazo</h4>
+                            <p>Detección temprana</p>
+                        </div>
+                    </div>
+                    <div class="service-item">
+                        <div class="service-icon"><i class="fas fa-heartbeat"></i></div>
+                        <div>
+                            <h4>Perfiles Hormonales</h4>
+                            <p>Tiroides, fertilidad</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver foto de portada completa -->
+<div id="coverModal" class="cover-modal" ondblclick="closeCoverModal()">
+    <div class="cover-modal-content" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">
+        <button class="cover-modal-close" onclick="closeCoverModal()"><i class="fas fa-times"></i></button>
+        <img id="coverModalImg" src="" alt="Foto de Portada">
+    </div>
+    <div
+        style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.85rem;">
+        <i class="fas fa-mouse-pointer"></i> Doble clic para cerrar | ESC para salir
+    </div>
+</div>
+
+<style>
+    .cover-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cover-modal.active {
+        display: flex;
+    }
+
+    .cover-modal-content {
+        position: relative;
+        max-width: 95%;
+        max-height: 90vh;
+    }
+
+    .cover-modal-content img {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 10px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .cover-modal-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .cover-modal-close:hover {
+        transform: scale(1.2);
+        color: #F39C12;
+    }
+</style>
+
+<script>
+    function openCoverModal() {
+        const coverImg = document.getElementById('coverImage');
+        document.getElementById('coverModalImg').src = coverImg.src;
+        document.getElementById('coverModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCoverModal() {
+        document.getElementById('coverModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (document.getElementById('coverModal').classList.contains('active')) {
+            if (e.key === 'Escape') closeCoverModal();
+        }
+    });
+</script>
+
+{% endblock %}

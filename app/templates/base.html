@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,65 +10,137 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/laboratorio_perez.css') }}">
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" style="height: 40px; width: auto; border-radius: 8px; margin-right: 10px;">
-                Laboratorio Pérez
+    <nav class="navbar-apple">
+        <div class="navbar-apple-container">
+            <!-- Logo Circular Grande -->
+            <a href="{{ url_for('main.index') }}" class="navbar-apple-logo">
+                <div class="logo-circle">
+                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Laboratorio Pérez" class="logo-circle-img">
+                </div>
+                <div class="logo-text-apple">
+                    <span class="logo-name-apple">Perez</span>
+                    <span class="logo-subtitle-apple">LABORATORIOS CLÍNICOS</span>
+                </div>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
-                            <i class="fas fa-home"></i> Inicio
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'main.portal_resultados' %}active{% endif %}" href="{{ url_for('main.portal_resultados') }}">
-                            <i class="fas fa-file-medical"></i> Ver mis Resultados
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'main.catalogo_pruebas' %}active{% endif %}" href="{{ url_for('main.catalogo_pruebas') }}">
-                            <i class="fas fa-microscope"></i> Pruebas Disponibles
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.google.com/maps/dir/?api=1&destination=-19.588398057678,-65.750749111176" target="_blank" style="background: linear-gradient(135deg, #F39C12, #E67E22); color: white !important; border-radius: 25px; padding: 8px 20px !important; margin-left: 10px;">
-                            <i class="fas fa-map-marker-alt"></i> Encuéntranos
-                        </a>
-                    </li>
-                </ul>
+
+            <!-- Menú Desktop -->
+            <div class="navbar-apple-menu">
+                <a href="{{ url_for('main.index') }}" class="nav-link-apple {% if request.endpoint == 'main.index' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{{ url_for('main.servicios') }}" class="nav-link-apple {% if request.endpoint == 'main.servicios' %}active{% endif %}">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Nuestros Servicios</span>
+                </a>
+                <a href="{{ url_for('main.portal_resultados') }}" class="nav-link-apple {% if request.endpoint == 'main.portal_resultados' %}active{% endif %}">
+                    <i class="fas fa-file-medical"></i>
+                    <span>Ver mis Resultados</span>
+                </a>
+                <a href="{{ url_for('main.catalogo_pruebas') }}" class="nav-link-apple {% if request.endpoint == 'main.catalogo_pruebas' %}active{% endif %}">
+                    <i class="fas fa-microscope"></i>
+                    <span>Pruebas Disponibles</span>
+                </a>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=-19.588398057678,-65.750749111176" 
+                   target="_blank" 
+                   class="nav-link-apple nav-cta-apple">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Encuéntranos</span>
+                </a>
             </div>
+
+            <!-- Botón Hamburger -->
+            <button class="navbar-apple-toggle" id="navbarAppleToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <!-- Menú Móvil -->
+        <div class="navbar-apple-mobile" id="navbarAppleMenu">
+            <a href="{{ url_for('main.index') }}" class="nav-link-apple {% if request.endpoint == 'main.index' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="{{ url_for('main.servicios') }}" class="nav-link-apple {% if request.endpoint == 'main.servicios' %}active{% endif %}">
+                <i class="fas fa-concierge-bell"></i>
+                <span>Nuestros Servicios</span>
+            </a>
+            <a href="{{ url_for('main.portal_resultados') }}" class="nav-link-apple {% if request.endpoint == 'main.portal_resultados' %}active{% endif %}">
+                <i class="fas fa-file-medical"></i>
+                <span>Ver mis Resultados</span>
+            </a>
+            <a href="{{ url_for('main.catalogo_pruebas') }}" class="nav-link-apple {% if request.endpoint == 'main.catalogo_pruebas' %}active{% endif %}">
+                <i class="fas fa-microscope"></i>
+                <span>Pruebas Disponibles</span>
+            </a>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=-19.588398057678,-65.750749111176" 
+               target="_blank" 
+               class="nav-link-apple nav-cta-apple">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Encuéntranos</span>
+            </a>
         </div>
     </nav>
 
-    <div class="{% if request.endpoint not in ['main.index', 'main.portal_resultados', 'main.catalogo_pruebas'] %}main-container{% endif %}">
+    <div
+        class="{% if request.endpoint not in ['main.index', 'main.portal_resultados', 'main.catalogo_pruebas'] %}main-container{% endif %}">
 
         {% if request.endpoint not in ['main.index', 'main.portal_resultados', 'main.catalogo_pruebas'] %}
         <div class="container">
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% endwith %}
         </div>
         {% endif %}
-        
+
         {% block content %}{% endblock %}
     </div>
 
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/menu-movil.js') }}"></script>
+    <script>
+        // Menú móvil estilo Apple
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('navbarAppleToggle');
+            const menu = document.getElementById('navbarAppleMenu');
+            
+            if (toggle && menu) {
+                toggle.addEventListener('click', function() {
+                    toggle.classList.toggle('active');
+                    menu.classList.toggle('active');
+                });
+                
+                // Cerrar menú al hacer click en un link
+                const mobileLinks = menu.querySelectorAll('.nav-link-apple');
+                mobileLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        toggle.classList.remove('active');
+                        menu.classList.remove('active');
+                    });
+                });
+                
+                // Cerrar menú al hacer click fuera
+                document.addEventListener('click', function(e) {
+                    if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+                        toggle.classList.remove('active');
+                        menu.classList.remove('active');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>

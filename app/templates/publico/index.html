@@ -2,508 +2,1021 @@
 {% block title %}Inicio - Laboratorio Pérez{% endblock %}
 {% block content %}
 <style>
-/* ========== VARIABLES Y CONFIGURACIÓN GLOBAL ========== */
-:root {
-    --primary-green: #1ABC9C;
-    --dark-green: #16A085;
-    --primary-orange: #F39C12;
-    --dark-orange: #E67E22;
-    --light-bg: #F8F9FA;
-    --dark-gray: #2C3E50;
-    --text-gray: #4A5568;
-    --white: #FFFFFF;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0 !important;
-    padding: 0 !important;
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-
-/* ========== ANIMACIONES ========== */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes floatAnimation {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-20px);
-    }
-}
-
-/* ========== HERO SECTION MODERNO ========== */
-.hero-modern {
-    min-height: 100vh;
-    background: url("{{ url_for('static', filename='img/cerro.jpg') }}") center top/cover no-repeat;
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    padding: 60px 0;
-}
-
-.hero-modern::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, rgba(248, 249, 250, 0.15) 0%, rgba(248, 249, 250, 0.35) 25%, rgba(232, 245, 241, 0.75) 55%, rgba(232, 245, 241, 0.92) 100%);
-    animation: fadeInUp 1.5s ease-out;
-}
-
-.hero-content-center {
-    text-align: center;
-    position: relative;
-    z-index: 2;
-    animation: fadeInUp 1s ease-out;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-circular {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin: 0 auto 60px;
-    box-shadow: 0 20px 60px rgba(26, 188, 156, 0.4);
-    border: 8px solid var(--white);
-    animation: scaleIn 1s ease-out 0.3s both, floatAnimation 3s ease-in-out 1.5s infinite;
-}
-
-.hero-content-info {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.hero-badge-modern {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-    color: var(--white);
-    padding: 12px 30px;
-    border-radius: 50px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 30px;
-    box-shadow: 0 10px 30px rgba(26, 188, 156, 0.3);
-    animation: fadeInUp 1s ease-out 0.5s both;
-}
-
-.hero-modern h1 {
-    font-size: 4rem;
-    font-weight: 900;
-    color: var(--dark-gray);
-    margin-bottom: 30px;
-    line-height: 1.2;
-    letter-spacing: -2px;
-    animation: fadeInUp 1s ease-out 0.7s both;
-}
-
-.hero-modern h1 span {
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.hero-modern p {
-    font-size: 1.4rem;
-    color: var(--text-gray);
-    max-width: 700px;
-    margin: 0 auto 25px;
-    line-height: 1.8;
-    animation: fadeInUp 1s ease-out 0.9s both;
-}
-
-.hero-location-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--white);
-    padding: 15px 35px;
-    border-radius: 50px;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary-orange);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    margin-bottom: 50px;
-    animation: fadeInUp 1s ease-out 1.1s both;
-}
-
-.hero-location-badge i {
-    font-size: 1.5rem;
-    color: var(--primary-orange);
-}
-
-.hero-buttons-modern {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    animation: fadeInUp 1s ease-out 1.3s both;
-}
-
-.btn-hero-primary {
-    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-    color: var(--white);
-    padding: 20px 50px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.2rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 15px 40px rgba(26, 188, 156, 0.4);
-}
-
-.btn-hero-primary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(26, 188, 156, 0.5);
-    color: var(--white);
-}
-
-.btn-hero-secondary {
-    background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
-    color: var(--white);
-    padding: 20px 50px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.2rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 15px 40px rgba(243, 156, 18, 0.4);
-}
-
-.btn-hero-secondary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 50px rgba(243, 156, 18, 0.5);
-    color: var(--white);
-}
-
-/* ========== SECCIÓN DE SERVICIOS ========== */
-.services-modern {
-    padding: 120px 0;
-    background: var(--white);
-}
-
-.section-title-modern {
-    text-align: center;
-    margin-bottom: 80px;
-}
-
-.section-label {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
-    color: var(--white);
-    padding: 10px 25px;
-    border-radius: 30px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 20px;
-}
-
-.section-title-modern h2 {
-    font-size: 3.5rem;
-    font-weight: 900;
-    color: var(--dark-gray);
-    margin-bottom: 20px;
-    letter-spacing: -1.5px;
-}
-
-.section-title-modern p {
-    font-size: 1.2rem;
-    color: var(--text-gray);
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.8;
-}
-
-.service-card-modern {
-    background: var(--white);
-    border-radius: 25px;
-    padding: 50px 40px;
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 3px solid transparent;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-    height: 100%;
-}
-
-.service-card-modern:hover {
-    transform: translateY(-15px);
-    border-color: var(--primary-green);
-    box-shadow: 0 25px 60px rgba(26, 188, 156, 0.2);
-}
-
-.service-icon-modern {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 30px;
-    transition: all 0.4s ease;
-    transform: rotate(5deg);
-}
-
-.service-card-modern:hover .service-icon-modern {
-    transform: rotate(0deg) scale(1.1);
-    box-shadow: 0 20px 50px rgba(26, 188, 156, 0.4);
-}
-
-.service-icon-modern i {
-    font-size: 45px;
-    color: var(--white);
-}
-
-.service-card-modern h3 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--dark-gray);
-    margin-bottom: 18px;
-}
-
-.service-card-modern p {
-    color: var(--text-gray);
-    font-size: 1.05rem;
-    line-height: 1.8;
-}
-
-/* ========== FOOTER - DISEÑO INSPIRADO EN WESLEY ========== */
-.footer-inspirado {
-    background-color: #111111;
-    color: rgba(255, 255, 255, 0.75);
-    padding: 60px 0 0;
-}
-
-/* Títulos de sección (NAVEGACIÓN, CONTACTO, etc.) */
-.footer-inspirado h5 {
-    color: var(--white);
-    font-weight: 700;
-    font-size: 1rem;
-    margin-bottom: 25px;
-    position: relative;
-    padding-left: 15px;
-    text-transform: uppercase;
-}
-
-/* Línea de acento naranja */
-.footer-inspirado h5::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 20px;
-    width: 5px;
-    background-color: var(--primary-orange);
-}
-
-/* Col 1: Logo y Texto */
-.footer-logo-main {
-    width: 180px;
-    margin-bottom: 20px;
-}
-
-.footer-about-text {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    margin-bottom: 20px;
-}
-
-/* Col 2: Navegación con '+' */
-.footer-nav-links {
-    list-style: none;
-    padding-left: 0;
-}
-
-.footer-nav-links li a {
-    color: rgba(255, 255, 255, 0.75);
-    text-decoration: none;
-    margin-bottom: 12px;
-    display: block;
-    transition: all 0.3s ease;
-}
-
-.footer-nav-links li a:hover {
-    color: var(--primary-orange);
-    padding-left: 5px;
-}
-
-.footer-nav-links li a::before {
-    content: '+';
-    color: var(--primary-orange);
-    margin-right: 10px;
-    font-weight: 700;
-}
-
-/* Col 3: Lista de Contacto con iconos */
-.footer-contact-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.footer-contact-list li {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    font-size: 0.95rem;
-}
-
-.footer-contact-list i {
-    color: var(--primary-orange);
-    font-size: 1.1rem;
-    width: 25px;
-    margin-top: 4px;
-}
-
-/* Estilo para enlaces de contacto cliqueables */
-.footer-contact-link {
-    color: rgba(255, 255, 255, 0.75);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-.footer-contact-link:hover {
-    color: var(--primary-orange);
-    text-decoration: underline;
-}
-
-
-/* Col 4: Imagen del Cerro */
-.footer-cerro-img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover; /* "zoom" */
-    border-radius: 8px;
-    object-position: center 20%; /* <--- AJUSTADO AL 20% */
-    border: 3px solid var(--primary-orange);
-}
-
-/* Barra de Copyright inferior */
-.footer-copyright {
-    background-color: #000;
-    padding: 20px 0;
-    margin-top: 40px;
-    position: relative;
-}
-
-.footer-copyright p {
-    margin-bottom: 0;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.9rem;
-}
-
-.footer-copyright-logo {
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    opacity: 0.4;
-    filter: invert(1);
-}
-
-
-/* Ocultar el footer-modern anterior */
-.footer-modern {
-    display: none;
-}
-
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 992px) {
-    .hero-modern h1 {
-        font-size: 2.8rem;
+    /* ========== VARIABLES Y CONFIGURACIÓN GLOBAL ========== */
+    :root {
+        --primary-green: #1ABC9C;
+        --dark-green: #16A085;
+        --primary-orange: #F39C12;
+        --dark-orange: #E67E22;
+        --light-bg: #F8F9FA;
+        --dark-gray: #2C3E50;
+        --text-gray: #4A5568;
+        --white: #FFFFFF;
     }
 
-    .section-title-modern h2 {
-        font-size: 2.5rem;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-}
 
-@media (max-width: 768px) {
-    .hero-modern h1 {
-        font-size: 2.2rem;
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    /* ========== ANIMACIONES ========== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes floatAnimation {
+
+        0%,
+        100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    /* ========== HERO SECTION MODERNO ========== */
+    .hero-modern {
+        min-height: 100vh;
+        background: url("{{ url_for('static', filename='img/cerro.jpg') }}") center top/cover no-repeat;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        padding: 60px 0;
+    }
+
+    .hero-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(248, 249, 250, 0.15) 0%, rgba(248, 249, 250, 0.35) 25%, rgba(232, 245, 241, 0.75) 55%, rgba(232, 245, 241, 0.92) 100%);
+        animation: fadeInUp 1.5s ease-out;
+    }
+
+    .hero-content-center {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+        animation: fadeInUp 1s ease-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .logo-circular {
-        width: 140px;
-        height: 140px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 60px;
+        box-shadow: 0 20px 60px rgba(26, 188, 156, 0.4);
+        border: 8px solid var(--white);
+        animation: scaleIn 1s ease-out 0.3s both, floatAnimation 3s ease-in-out 1.5s infinite;
     }
 
-    .btn-hero-primary,
+    .hero-content-info {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .hero-badge-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(26, 188, 156, 0.3);
+        animation: fadeInUp 1s ease-out 0.5s both;
+    }
+
+    .hero-modern h1 {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--dark-gray);
+        margin-bottom: 30px;
+        line-height: 1.2;
+        letter-spacing: -2px;
+        animation: fadeInUp 1s ease-out 0.7s both;
+    }
+
+    .hero-modern h1 span {
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero-modern p {
+        font-size: 1.4rem;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 0 auto 25px;
+        line-height: 1.8;
+        animation: fadeInUp 1s ease-out 0.9s both;
+    }
+
+    .hero-location-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--white);
+        padding: 15px 35px;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-orange);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        margin-bottom: 50px;
+        animation: fadeInUp 1s ease-out 1.1s both;
+    }
+
+    .hero-location-badge i {
+        font-size: 1.5rem;
+        color: var(--primary-orange);
+    }
+
+    .hero-buttons-modern {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 1.3s both;
+    }
+
+    .btn-hero-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        padding: 20px 50px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 15px 40px rgba(26, 188, 156, 0.4);
+    }
+
+    .btn-hero-primary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(26, 188, 156, 0.5);
+        color: var(--white);
+    }
+
     .btn-hero-secondary {
-        padding: 16px 35px;
-        font-size: 1rem;
+        background: linear-gradient(135deg, var(--primary-orange), var(--dark-orange));
+        color: var(--white);
+        padding: 20px 50px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 15px 40px rgba(243, 156, 18, 0.4);
+    }
+
+    .btn-hero-secondary:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(243, 156, 18, 0.5);
+        color: var(--white);
+    }
+
+    /* ========== SECCIÓN DE SERVICIOS ========== */
+    .services-modern {
+        padding: 120px 0;
+        background: var(--white);
+    }
+
+    .section-title-modern {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+
+    .section-label {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+        color: var(--white);
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 20px;
+    }
+
+    .section-title-modern h2 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: var(--dark-gray);
+        margin-bottom: 20px;
+        letter-spacing: -1.5px;
+    }
+
+    .section-title-modern p {
+        font-size: 1.2rem;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.8;
+    }
+
+    .service-card-modern {
+        background: var(--white);
+        border-radius: 25px;
+        padding: 50px 40px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 3px solid transparent;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        height: 100%;
+    }
+
+    .service-card-modern:hover {
+        transform: translateY(-15px);
+        border-color: var(--primary-green);
+        box-shadow: 0 25px 60px rgba(26, 188, 156, 0.2);
     }
 
     .service-icon-modern {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        transition: all 0.4s ease;
+        transform: rotate(5deg);
+    }
+
+    .service-card-modern:hover .service-icon-modern {
+        transform: rotate(0deg) scale(1.1);
+        box-shadow: 0 20px 50px rgba(26, 188, 156, 0.4);
     }
 
     .service-icon-modern i {
-        font-size: 35px;
+        font-size: 45px;
+        color: var(--white);
     }
-    
-    .footer-copyright p {
+
+    .service-card-modern h3 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--dark-gray);
+        margin-bottom: 18px;
+    }
+
+    .service-card-modern p {
+        color: var(--text-gray);
+        font-size: 1.05rem;
+        line-height: 1.8;
+    }
+
+    /* ========== GALERÍA DE IMÁGENES MODERNA ========== */
+    .gallery-section {
+        padding: 100px 0;
+        background: linear-gradient(180deg, #0a1628 0%, #1a2d4a 50%, #0f1f35 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .gallery-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(ellipse at 20% 30%, rgba(26, 188, 156, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 70%, rgba(243, 156, 18, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .gallery-title-wrapper {
         text-align: center;
-        padding-right: 0;
+        margin-bottom: 60px;
+        position: relative;
+        z-index: 2;
     }
-    
+
+    .gallery-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(26, 188, 156, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(26, 188, 156, 0.3);
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-green);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+    }
+
+    .gallery-title-wrapper h2 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffffff 0%, #1ABC9C 50%, #F39C12 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+        letter-spacing: -1px;
+    }
+
+    .gallery-title-wrapper p {
+        font-size: 1.15rem;
+        color: rgba(255, 255, 255, 0.7);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Contenedor principal del carrusel */
+    .gallery-main-container {
+        position: relative;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Visor principal de imagen */
+    .gallery-main-viewer {
+        position: relative;
+        width: 100%;
+        height: 550px;
+        border-radius: 24px;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow:
+            0 30px 60px rgba(0, 0, 0, 0.4),
+            0 0 100px rgba(26, 188, 156, 0.1),
+            inset 0 0 80px rgba(0, 0, 0, 0.2);
+        margin-bottom: 25px;
+    }
+
+    .gallery-main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        opacity: 0;
+        transition: opacity 0.5s ease, transform 0.4s ease;
+        cursor: zoom-in;
+        padding: 20px;
+    }
+
+    .gallery-main-image.active {
+        opacity: 1;
+    }
+
+    .gallery-main-image:hover {
+        transform: scale(1.02);
+    }
+
+    /* Contador de fotos */
+    .gallery-counter {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(10px);
+        padding: 12px 20px;
+        border-radius: 50px;
+        color: white;
+        font-weight: 700;
+        font-size: 0.95rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .gallery-counter i {
+        color: var(--primary-green);
+    }
+
+    /* Título de la imagen actual */
+    .gallery-current-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%);
+        padding: 60px 30px 25px;
+        color: white;
+        z-index: 5;
+    }
+
+    .gallery-current-title h4 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0 0 5px 0;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .gallery-current-title p {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+    }
+
+    /* Botones de navegación */
+    .gallery-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .gallery-nav-btn:hover {
+        background: linear-gradient(135deg, var(--primary-green), var(--primary-orange));
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 10px 30px rgba(26, 188, 156, 0.4);
+        border-color: transparent;
+    }
+
+    .gallery-nav-btn:active {
+        transform: translateY(-50%) scale(0.95);
+    }
+
+    .gallery-nav-prev {
+        left: 20px;
+    }
+
+    .gallery-nav-next {
+        right: 20px;
+    }
+
+    /* Grid de miniaturas */
+    .gallery-thumbnails-wrapper {
+        position: relative;
+        overflow: hidden;
+        padding: 15px 60px;
+    }
+
+    .gallery-thumbnails-track {
+        display: flex;
+        gap: 15px;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 10px 0;
+    }
+
+    .gallery-thumbnail {
+        flex: 0 0 auto;
+        width: 100px;
+        height: 75px;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 3px solid transparent;
+        opacity: 0.6;
+        position: relative;
+    }
+
+    .gallery-thumbnail::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(26, 188, 156, 0.3), rgba(243, 156, 18, 0.3));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .gallery-thumbnail:hover {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery-thumbnail:hover::after {
+        opacity: 1;
+    }
+
+    .gallery-thumbnail.active {
+        opacity: 1;
+        border-color: var(--primary-green);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(26, 188, 156, 0.4), 0 0 20px rgba(26, 188, 156, 0.2);
+    }
+
+    .gallery-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Botones de scroll para miniaturas */
+    .thumb-scroll-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(26, 188, 156, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .thumb-scroll-btn:hover {
+        background: var(--primary-green);
+        box-shadow: 0 5px 20px rgba(26, 188, 156, 0.4);
+    }
+
+    .thumb-scroll-prev {
+        left: 5px;
+    }
+
+    .thumb-scroll-next {
+        right: 5px;
+    }
+
+    /* Barra de progreso */
+    .gallery-progress-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin-top: 25px;
+        overflow: hidden;
+    }
+
+    .gallery-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-green), var(--primary-orange));
+        border-radius: 2px;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 10px rgba(26, 188, 156, 0.5);
+    }
+
+    /* Modal de vista completa */
+    .gallery-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(20px);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .gallery-modal.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .gallery-modal-content {
+        position: relative;
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    .gallery-modal-image {
+        max-width: 100%;
+        max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .gallery-modal-close {
+        position: absolute;
+        top: -50px;
+        right: 0;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gallery-modal-close:hover {
+        background: #e74c3c;
+        transform: rotate(90deg);
+    }
+
+    .gallery-modal-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .gallery-modal-nav:hover {
+        background: var(--primary-green);
+    }
+
+    .gallery-modal-prev {
+        left: -70px;
+    }
+
+    .gallery-modal-next {
+        right: -70px;
+    }
+
+    /* ========== ESTILOS ANTIGUOS (mantener compatibilidad) ========== */
+    .gallery-carousel-section {
+        display: none;
+    }
+
+    /* ========== FOOTER - DISEÑO INSPIRADO EN WESLEY ========== */
+    .footer-inspirado {
+        background-color: #111111;
+        color: rgba(255, 255, 255, 0.75);
+        padding: 60px 0 0;
+    }
+
+    /* Títulos de sección (NAVEGACIÓN, CONTACTO, etc.) */
+    .footer-inspirado h5 {
+        color: var(--white);
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 25px;
+        position: relative;
+        padding-left: 15px;
+        text-transform: uppercase;
+    }
+
+    /* Línea de acento naranja */
+    .footer-inspirado h5::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 20px;
+        width: 5px;
+        background-color: var(--primary-orange);
+    }
+
+    /* Col 1: Logo y Texto */
+    .footer-logo-main {
+        width: 180px;
+        margin-bottom: 20px;
+    }
+
+    .footer-about-text {
+        font-size: 0.9rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
+    }
+
+    /* Col 2: Navegación con '+' */
+    .footer-nav-links {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .footer-nav-links li a {
+        color: rgba(255, 255, 255, 0.75);
+        text-decoration: none;
+        margin-bottom: 12px;
+        display: block;
+        transition: all 0.3s ease;
+    }
+
+    .footer-nav-links li a:hover {
+        color: var(--primary-orange);
+        padding-left: 5px;
+    }
+
+    .footer-nav-links li a::before {
+        content: '+';
+        color: var(--primary-orange);
+        margin-right: 10px;
+        font-weight: 700;
+    }
+
+    /* Col 3: Lista de Contacto con iconos */
+    .footer-contact-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .footer-contact-list li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+    }
+
+    .footer-contact-list i {
+        color: var(--primary-orange);
+        font-size: 1.1rem;
+        width: 25px;
+        margin-top: 4px;
+    }
+
+    /* Estilo para enlaces de contacto cliqueables */
+    .footer-contact-link {
+        color: rgba(255, 255, 255, 0.75);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .footer-contact-link:hover {
+        color: var(--primary-orange);
+        text-decoration: underline;
+    }
+
+
+    /* Col 4: Imagen del Cerro */
+    .footer-cerro-img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        /* "zoom" */
+        border-radius: 8px;
+        object-position: center 20%;
+        /* <--- AJUSTADO AL 20% */
+        border: 3px solid var(--primary-orange);
+    }
+
+    /* Barra de Copyright inferior */
+    .footer-copyright {
+        background-color: #000;
+        padding: 20px 0;
+        margin-top: 40px;
+        position: relative;
+    }
+
+    .footer-copyright p {
+        margin-bottom: 0;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9rem;
+    }
+
     .footer-copyright-logo {
-        display: none; /* Ocultar el logo en móvil */
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 30px;
+        opacity: 0.4;
+        filter: invert(1);
     }
-}
+
+
+    /* Ocultar el footer-modern anterior */
+    .footer-modern {
+        display: none;
+    }
+
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 992px) {
+        .hero-modern h1 {
+            font-size: 2.8rem;
+        }
+
+        .section-title-modern h2 {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-modern h1 {
+            font-size: 2.2rem;
+        }
+
+        .logo-circular {
+            width: 140px;
+            height: 140px;
+        }
+
+        .btn-hero-primary,
+        .btn-hero-secondary {
+            padding: 16px 35px;
+            font-size: 1rem;
+        }
+
+        .service-icon-modern {
+            width: 80px;
+            height: 80px;
+        }
+
+        .service-icon-modern i {
+            font-size: 35px;
+        }
+
+        .footer-copyright p {
+            text-align: center;
+            padding-right: 0;
+        }
+
+        .footer-copyright-logo {
+            display: none;
+            /* Ocultar el logo en móvil */
+        }
+
+        /* Galería responsive */
+        .gallery-section {
+            padding: 80px 0;
+        }
+
+        .gallery-title-wrapper h2 {
+            font-size: 2.5rem;
+        }
+
+        .gallery-main-viewer {
+            height: 450px;
+        }
+
+        .gallery-nav-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .gallery-nav-prev {
+            left: 10px;
+        }
+
+        .gallery-nav-next {
+            right: 10px;
+        }
+
+        .gallery-thumbnail {
+            width: 80px;
+            height: 60px;
+        }
+
+        .gallery-thumbnails-wrapper {
+            padding: 10px 50px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .gallery-section {
+            padding: 60px 0;
+        }
+
+        .gallery-title-wrapper h2 {
+            font-size: 2rem;
+        }
+
+        .gallery-main-viewer {
+            height: 350px;
+            border-radius: 16px;
+        }
+
+        .gallery-main-image {
+            padding: 10px;
+        }
+
+        .gallery-current-title h4 {
+            font-size: 1.2rem;
+        }
+
+        .gallery-counter {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            top: 10px;
+            right: 10px;
+        }
+
+        .gallery-nav-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .gallery-nav-prev {
+            left: 5px;
+        }
+
+        .gallery-nav-next {
+            right: 5px;
+        }
+
+        .gallery-thumbnail {
+            width: 60px;
+            height: 45px;
+            border-radius: 8px;
+        }
+
+        .gallery-thumbnails-wrapper {
+            padding: 10px 40px;
+        }
+
+        .thumb-scroll-btn {
+            width: 35px;
+            height: 35px;
+        }
+
+        .gallery-modal-nav {
+            width: 40px;
+            height: 40px;
+        }
+
+        .gallery-modal-prev {
+            left: -50px;
+        }
+
+        .gallery-modal-next {
+            right: -50px;
+        }
+    }
 </style>
 
 <section class="hero-modern">
     <div class="container">
         <div class="hero-content-center">
-            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo Laboratorio Pérez" class="logo-circular">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo Laboratorio Pérez"
+                class="logo-circular">
 
             <div class="hero-content-info">
                 <div class="hero-badge-modern">
@@ -513,7 +1026,8 @@ body {
 
                 <h1>Laboratorio Clínico <span>Pérez</span></h1>
 
-                <p>Exámenes de laboratorio con la más alta calidad y precisión. Tecnología de punta y resultados confiables para cuidar tu salud.</p>
+                <p>Exámenes de laboratorio con la más alta calidad y precisión. Tecnología de punta y resultados
+                    confiables para cuidar tu salud.</p>
 
                 <div class="hero-location-badge">
                     <i class="fas fa-map-marker-alt"></i>
@@ -540,7 +1054,8 @@ body {
         <div class="section-title-modern">
             <div class="section-label">Nuestros Servicios</div>
             <h2>Soluciones Completas de Diagnóstico</h2>
-            <p>Contamos con tecnología de última generación y un equipo altamente calificado para brindarte los mejores resultados.</p>
+            <p>Contamos con tecnología de última generación y un equipo altamente calificado para brindarte los mejores
+                resultados.</p>
         </div>
 
         <div class="row g-4">
@@ -607,21 +1122,102 @@ body {
     </div>
 </section>
 
+<!-- ========== GALERÍA DE IMÁGENES MODERNA ========== -->
+<section class="gallery-section">
+    <div class="container">
+        <div class="gallery-title-wrapper">
+            <div class="gallery-badge">
+                <i class="fas fa-images"></i>
+                Galería
+            </div>
+            <h2>Nuestro Laboratorio</h2>
+            <p>Conoce nuestras instalaciones, equipos de última generación y los servicios que ofrecemos para cuidar tu
+                salud.</p>
+        </div>
+
+        <div class="gallery-main-container">
+            <!-- Visor principal -->
+            <div class="gallery-main-viewer">
+                <img src="" alt="" class="gallery-main-image active" id="mainImage">
+
+                <!-- Contador -->
+                <div class="gallery-counter">
+                    <i class="fas fa-image"></i>
+                    <span id="imageCounter">1 / 21</span>
+                </div>
+
+                <!-- Título de la imagen actual -->
+                <div class="gallery-current-title">
+                    <h4 id="currentTitle">Análisis Especializados</h4>
+                    <p id="currentDescription">Servicios de laboratorio clínico de alta calidad</p>
+                </div>
+
+                <!-- Botones de navegación -->
+                <button class="gallery-nav-btn gallery-nav-prev" id="galleryPrev" aria-label="Imagen anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="gallery-nav-btn gallery-nav-next" id="galleryNext" aria-label="Imagen siguiente">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Grid de miniaturas -->
+            <div class="gallery-thumbnails-wrapper">
+                <button class="thumb-scroll-btn thumb-scroll-prev" id="thumbPrev" aria-label="Scroll izquierda">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="gallery-thumbnails-track" id="thumbnailsTrack">
+                    <!-- Thumbnails se generan dinámicamente -->
+                </div>
+
+                <button class="thumb-scroll-btn thumb-scroll-next" id="thumbNext" aria-label="Scroll derecha">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Barra de progreso -->
+            <div class="gallery-progress-bar">
+                <div class="gallery-progress-fill" id="progressFill" style="width: 4.35%;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de vista completa -->
+<div class="gallery-modal" id="galleryModal">
+    <div class="gallery-modal-content">
+        <button class="gallery-modal-close" id="modalClose" aria-label="Cerrar">
+            <i class="fas fa-times"></i>
+        </button>
+        <img src="" alt="" class="gallery-modal-image" id="modalImage">
+        <button class="gallery-modal-nav gallery-modal-prev" id="modalPrev" aria-label="Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="gallery-modal-nav gallery-modal-next" id="modalNext" aria-label="Siguiente">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
 <footer class="footer-inspirado">
     <div class="container">
         <div class="row">
 
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
-                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo Laboratorio Pérez" class="footer-logo-main">
+                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo Laboratorio Pérez"
+                    class="footer-logo-main">
                 <p class="footer-about-text">
-                    Más de 10 años brindando servicios de análisis clínicos especializados con la más alta calidad y precisión.
+                    Más de 10 años brindando servicios de análisis clínicos especializados con la más alta calidad y
+                    precisión.
                 </p>
                 <h5 class="mt-4">REDES SOCIALES</h5>
                 <ul class="footer-contact-list">
                     <li>
                         <i class="fab fa-facebook-f"></i>
                         <div>
-                            <a href="https://www.facebook.com/laboratorios.perez" target="_blank" class="footer-contact-link">
+                            <a href="https://www.facebook.com/laboratorios.perez" target="_blank"
+                                class="footer-contact-link">
                                 Laboratorios Pérez
                             </a>
                         </div>
@@ -651,14 +1247,16 @@ body {
                         <i class="fab fa-whatsapp"></i>
                         <div>
                             <strong>WhatsApp:</strong>
-                            <a href="https://wa.me/59167619188" target="_blank" class="footer-contact-link">+591 67619188</a>
+                            <a href="https://wa.me/59167619188" target="_blank" class="footer-contact-link">+591
+                                67619188</a>
                         </div>
                     </li>
                     <li>
                         <i class="fas fa-envelope"></i>
                         <div>
                             <strong>Email:</strong>
-                            <a href="mailto:laboratorios.perez@gmail.com" class="footer-contact-link">laboratorios.perez@gmail.com</a>
+                            <a href="mailto:laboratorios.perez@gmail.com"
+                                class="footer-contact-link">laboratorios.perez@gmail.com</a>
                         </div>
                     </li>
                     <li>
@@ -672,7 +1270,8 @@ body {
 
             <div class="col-lg-3 col-md-6">
                 <h5>POTOSÍ</h5>
-                <img src="{{ url_for('static', filename='img/cerro.jpg') }}" alt="Cerro Rico de Potosí" class="footer-cerro-img">
+                <img src="{{ url_for('static', filename='img/cerro.jpg') }}" alt="Cerro Rico de Potosí"
+                    class="footer-cerro-img">
             </div>
 
         </div>
@@ -683,10 +1282,265 @@ body {
             <div class="row">
                 <div class="col-12">
                     <p>&copy; 2025 Laboratorio Clínico Pérez. Todos los derechos reservados.</p>
-                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="footer-copyright-logo">
+                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo"
+                        class="footer-copyright-logo">
                 </div>
             </div>
         </div>
     </div>
 </footer>
+
+<script>
+    // ========== GALERÍA DE IMÁGENES MODERNA ==========
+    (function () {
+        // Datos de las imágenes - TODAS LAS 21 FOTOS (sin duplicados)
+        const galleryImages = [
+            { src: "{{ url_for('static', filename='img/analisis_especializados.jpg') }}", title: "Análisis Especializados", desc: "Servicios de laboratorio clínico de alta calidad" },
+            { src: "{{ url_for('static', filename='img/resultados_rapidos_maglumi.jpg') }}", title: "Resultados Rápidos", desc: "Tecnología MAGLUMI para resultados precisos" },
+            { src: "{{ url_for('static', filename='img/horario_atencion.jpg') }}", title: "Horario de Atención", desc: "Atención personalizada en horarios convenientes" },
+            { src: "{{ url_for('static', filename='img/fertilidad_antimulleriana.jpg') }}", title: "Pruebas de Fertilidad", desc: "Hormona Antimülleriana y estudios hormonales" },
+            { src: "{{ url_for('static', filename='img/pruebas_adn.jpg') }}", title: "Pruebas de ADN", desc: "Análisis genéticos con máxima precisión" },
+
+            { src: "{{ url_for('static', filename='img/pruebas_paternidad.jpg') }}", title: "Pruebas de Paternidad", desc: "Resultados confidenciales y precisos" },
+            { src: "{{ url_for('static', filename='img/pruebas_embarazo.jpg') }}", title: "Pruebas de Embarazo", desc: "Detección temprana y precisa" },
+
+            { src: "{{ url_for('static', filename='img/resultados_diabeticos.jpg') }}", title: "Control de Diabetes", desc: "Monitoreo integral para diabéticos" },
+            { src: "{{ url_for('static', filename='img/diabetes_sintomas.png') }}", title: "Síntomas de Diabetes", desc: "Información sobre detección temprana" },
+            { src: "{{ url_for('static', filename='img/hemoglobina_glicosilada.png') }}", title: "Hemoglobina Glicosilada", desc: "Control a largo plazo de la glucosa" },
+            { src: "{{ url_for('static', filename='img/tips_glucosa.jpg') }}", title: "Tips para Glucosa", desc: "Consejos para mantener niveles saludables" },
+            { src: "{{ url_for('static', filename='img/ubicacion_mapa.jpg') }}", title: "Nuestra Ubicación", desc: "Encuéntranos en Potosí, Bolivia" },
+            { src: "{{ url_for('static', filename='img/pruebas_alergias.jpg') }}", title: "Pruebas de Alergias", desc: "Detección de sensibilidades e intolerancias" },
+            { src: "{{ url_for('static', filename='img/prueba_pcr_virus.jpg') }}", title: "Pruebas PCR", desc: "Detección precisa de virus y enfermedades" },
+            { src: "{{ url_for('static', filename='img/nutricion_hemoglobina.jpg') }}", title: "Nutrición y Hemoglobina", desc: "Análisis nutricionales completos" },
+            { src: "{{ url_for('static', filename='img/acido_urico_gota.png') }}", title: "Ácido Úrico", desc: "Prevención y control de gota" },
+            { src: "{{ url_for('static', filename='img/depuracion_creatinina.png') }}", title: "Depuración de Creatinina", desc: "Evaluación de función renal" },
+            { src: "{{ url_for('static', filename='img/fsh_fertilidad.png') }}", title: "Hormona FSH", desc: "Estudios de fertilidad femenina y masculina" },
+            { src: "{{ url_for('static', filename='img/hidratacion.png') }}", title: "Hidratación", desc: "Importancia del equilibrio hídrico" },
+            { src: "{{ url_for('static', filename='img/proteccion_piel_uv.png') }}", title: "Protección UV", desc: "Cuidado de la piel y prevención" },
+            { src: "{{ url_for('static', filename='img/logo_perez.png') }}", title: "Laboratorio Pérez", desc: "Tu laboratorio de confianza en Potosí" }
+        ];
+
+        // Elementos del DOM
+        const mainImage = document.getElementById('mainImage');
+        const imageCounter = document.getElementById('imageCounter');
+        const currentTitle = document.getElementById('currentTitle');
+        const currentDescription = document.getElementById('currentDescription');
+        const thumbnailsTrack = document.getElementById('thumbnailsTrack');
+        const progressFill = document.getElementById('progressFill');
+        const galleryModal = document.getElementById('galleryModal');
+        const modalImage = document.getElementById('modalImage');
+
+        let currentIndex = 0;
+        let autoplayInterval;
+        let thumbnailOffset = 0;
+        const autoplayDelay = 12000;
+
+        // Inicializar galería
+        function initGallery() {
+            // Generar miniaturas
+            galleryImages.forEach((img, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'gallery-thumbnail' + (index === 0 ? ' active' : '');
+                thumb.innerHTML = `<img src="${img.src}" alt="${img.title}" loading="lazy">`;
+                thumb.addEventListener('click', () => goToImage(index));
+                thumbnailsTrack.appendChild(thumb);
+            });
+
+            // Cargar primera imagen
+            updateGallery();
+            startAutoplay();
+        }
+
+        // Actualizar galería
+        function updateGallery() {
+            const img = galleryImages[currentIndex];
+
+            // Fade out
+            mainImage.classList.remove('active');
+
+            setTimeout(() => {
+                mainImage.src = img.src;
+                mainImage.alt = img.title;
+
+                // Fade in
+                setTimeout(() => mainImage.classList.add('active'), 50);
+            }, 300);
+
+            // Actualizar info
+            currentTitle.textContent = img.title;
+            currentDescription.textContent = img.desc;
+            imageCounter.textContent = `${currentIndex + 1} / ${galleryImages.length}`;
+
+            // Actualizar barra de progreso
+            const progress = ((currentIndex + 1) / galleryImages.length) * 100;
+            progressFill.style.width = `${progress}%`;
+
+            // Actualizar miniaturas activas
+            document.querySelectorAll('.gallery-thumbnail').forEach((thumb, index) => {
+                thumb.classList.toggle('active', index === currentIndex);
+            });
+
+            // Centrar miniatura activa
+            centerActiveThumbnail();
+        }
+
+        // Centrar miniatura activa en la vista
+        function centerActiveThumbnail() {
+            const thumbnails = document.querySelectorAll('.gallery-thumbnail');
+            if (thumbnails.length === 0) return;
+
+            const thumbWidth = 115; // width + gap
+            const visibleThumbs = Math.floor((thumbnailsTrack.parentElement.offsetWidth - 120) / thumbWidth);
+            const maxOffset = Math.max(0, thumbnails.length - visibleThumbs);
+
+            // Calcular offset para centrar la miniatura activa
+            let targetOffset = currentIndex - Math.floor(visibleThumbs / 2);
+            targetOffset = Math.max(0, Math.min(targetOffset, maxOffset));
+
+            thumbnailOffset = targetOffset;
+            thumbnailsTrack.style.transform = `translateX(-${thumbnailOffset * thumbWidth}px)`;
+        }
+
+        // Ir a imagen específica
+        function goToImage(index) {
+            currentIndex = index;
+            updateGallery();
+            resetAutoplay();
+        }
+
+        // Siguiente imagen
+        function nextImage() {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+            updateGallery();
+        }
+
+        // Imagen anterior
+        function prevImage() {
+            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+            updateGallery();
+        }
+
+        // Scroll de miniaturas
+        function scrollThumbnails(direction) {
+            const thumbWidth = 115;
+            const thumbnails = document.querySelectorAll('.gallery-thumbnail');
+            const visibleThumbs = Math.floor((thumbnailsTrack.parentElement.offsetWidth - 120) / thumbWidth);
+            const maxOffset = Math.max(0, thumbnails.length - visibleThumbs);
+
+            if (direction === 'next') {
+                thumbnailOffset = Math.min(thumbnailOffset + 3, maxOffset);
+            } else {
+                thumbnailOffset = Math.max(thumbnailOffset - 3, 0);
+            }
+
+            thumbnailsTrack.style.transform = `translateX(-${thumbnailOffset * thumbWidth}px)`;
+        }
+
+        // Autoplay
+        function startAutoplay() {
+            autoplayInterval = setInterval(nextImage, autoplayDelay);
+        }
+
+        function stopAutoplay() {
+            clearInterval(autoplayInterval);
+        }
+
+        function resetAutoplay() {
+            stopAutoplay();
+            startAutoplay();
+        }
+
+        // Modal
+        function openModal() {
+            galleryModal.classList.add('active');
+            modalImage.src = galleryImages[currentIndex].src;
+            modalImage.alt = galleryImages[currentIndex].title;
+            document.body.style.overflow = 'hidden';
+            stopAutoplay();
+        }
+
+        function closeModal() {
+            galleryModal.classList.remove('active');
+            document.body.style.overflow = '';
+            startAutoplay();
+        }
+
+        // Event Listeners
+        document.getElementById('galleryPrev').addEventListener('click', () => { prevImage(); resetAutoplay(); });
+        document.getElementById('galleryNext').addEventListener('click', () => { nextImage(); resetAutoplay(); });
+        document.getElementById('thumbPrev').addEventListener('click', () => scrollThumbnails('prev'));
+        document.getElementById('thumbNext').addEventListener('click', () => scrollThumbnails('next'));
+
+        // Modal events
+        mainImage.addEventListener('click', openModal);
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('modalPrev').addEventListener('click', () => { prevImage(); modalImage.src = galleryImages[currentIndex].src; });
+        document.getElementById('modalNext').addEventListener('click', () => { nextImage(); modalImage.src = galleryImages[currentIndex].src; });
+        galleryModal.addEventListener('click', (e) => { if (e.target === galleryModal) closeModal(); });
+
+        // Pausar en hover
+        const galleryContainer = document.querySelector('.gallery-main-container');
+        galleryContainer.addEventListener('mouseenter', stopAutoplay);
+        galleryContainer.addEventListener('mouseleave', startAutoplay);
+
+        // Navegación por teclado
+        document.addEventListener('keydown', (e) => {
+            if (galleryModal.classList.contains('active')) {
+                if (e.key === 'Escape') closeModal();
+                if (e.key === 'ArrowLeft') { prevImage(); modalImage.src = galleryImages[currentIndex].src; }
+                if (e.key === 'ArrowRight') { nextImage(); modalImage.src = galleryImages[currentIndex].src; }
+            } else {
+                // Solo responder si la galería está visible en viewport
+                const gallery = document.querySelector('.gallery-section');
+                const rect = gallery.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+                if (isVisible) {
+                    if (e.key === 'ArrowLeft') { prevImage(); resetAutoplay(); }
+                    if (e.key === 'ArrowRight') { nextImage(); resetAutoplay(); }
+                }
+            }
+        });
+
+        // Soporte para touch/swipe
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        const mainViewer = document.querySelector('.gallery-main-viewer');
+        mainViewer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        mainViewer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextImage();
+                } else {
+                    prevImage();
+                }
+                resetAutoplay();
+            }
+        }
+
+        // Pausar cuando no es visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoplay();
+            } else {
+                startAutoplay();
+            }
+        });
+
+        // Inicializar
+        initGallery();
+    })();
+</script>
 {% endblock %}

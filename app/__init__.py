@@ -22,6 +22,14 @@ def create_app():
     app.register_blueprint(main)
     app.register_blueprint(auth)
 
+    # ============ OPTIMIZACIÓN STATIC FILES (WHITENOISE) ============
+    from whitenoise import WhiteNoise
+    # Servir archivos estáticos de forma eficiente
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(app.root_path, 'static'), prefix='static/')
+    # Cacheo agresivo para imágenes (forever cache)
+    app.wsgi_app.add_files(os.path.join(app.root_path, 'static', 'uploads'), prefix='static/uploads/')
+
+
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
     # NOTA: db.create_all() comentado para evitar WORKER TIMEOUT en Render

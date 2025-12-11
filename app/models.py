@@ -42,6 +42,17 @@ class Resultado(db.Model):
     archivo_pdf = db.Column(db.String(200))
     codigo_acceso = db.Column(db.String(20), unique=True)  # Código de acceso debe ser único
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relación con Prueba (Nuevo campo para Tipo de Laboratorio)
+    prueba_id = db.Column(db.Integer, db.ForeignKey('pruebas.id'), nullable=True)
+    prueba = db.relationship('Prueba', backref='resultados')
+    
+    # Campos para soft-delete (papelera de reciclaje)
+    # Esto garantiza que los resultados se mantengan consultables indefinidamente
+    # hasta que se eliminen permanentemente
+    eliminado = db.Column(db.Boolean, default=False, nullable=False)
+    fecha_eliminacion = db.Column(db.DateTime, nullable=True)
+    eliminado_por = db.Column(db.String(100), nullable=True)
 
 class Prueba(db.Model):
     __tablename__ = 'pruebas'
@@ -52,3 +63,40 @@ class Prueba(db.Model):
     precio = db.Column(db.Float, default=0.0)
     imagen = db.Column(db.String(200))
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+
+# ============================================
+# MODELOS PARA REDES SOCIALES / PÁGINA PÚBLICA
+# ============================================
+
+class Publicacion(db.Model):
+    """Publicaciones para la página Nuestros Servicios (estilo Facebook)"""
+    __tablename__ = 'publicaciones'
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(200), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)
+    imagen = db.Column(db.String(300))  # Ruta de la imagen
+    icono = db.Column(db.String(50), default='fa-microscope')  # Icono FontAwesome
+    categoria = db.Column(db.String(100), default='General')
+    activo = db.Column(db.Boolean, default=True)
+    fecha_publicacion = db.Column(db.DateTime, default=datetime.utcnow)
+    orden = db.Column(db.Integer, default=0)  # Para ordenar manualmente
+
+class FotoGaleria(db.Model):
+    """Fotos para la galería pública"""
+    __tablename__ = 'fotos_galeria'
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(200), nullable=False)
+    descripcion = db.Column(db.String(500))
+    imagen = db.Column(db.String(300), nullable=False)
+    activo = db.Column(db.Boolean, default=True)
+    fecha_subida = db.Column(db.DateTime, default=datetime.utcnow)
+    orden = db.Column(db.Integer, default=0)
+
+class ConfiguracionLab(db.Model):
+    """Configuración del laboratorio (teléfono, email, horarios, etc.)"""
+    __tablename__ = 'configuracion_lab'
+    id = db.Column(db.Integer, primary_key=True)
+    clave = db.Column(db.String(100), unique=True, nullable=False)
+    valor = db.Column(db.Text, nullable=False)
+    descripcion = db.Column(db.String(200))
+    fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

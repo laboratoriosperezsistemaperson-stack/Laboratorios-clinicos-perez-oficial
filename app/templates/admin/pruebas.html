@@ -2,64 +2,9 @@
 {% block title %}Gestión de Pruebas{% endblock %}
 {% block content %}
 <style>
-    /* Eliminar padding superior del container */
-    .container-fluid {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
-    /* Header moderno estilo dashboard */
-    .page-header {
-        background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 0;
-        margin: 0 0 30px 0;
-        box-shadow: 0 10px 40px rgba(52, 152, 219, 0.3);
-    }
-
-    .page-header h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .page-header p {
-        font-size: 1.1rem;
-        opacity: 0.95;
-        margin: 0;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .btn-header {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        padding: 10px 25px;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-header:hover {
-        background: white;
-        color: #3498DB;
-        border-color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
     /* Contenedor del contenido */
     .content-wrapper {
-        padding: 0 30px 30px 30px;
+        padding: 30px;
     }
 
     .card {
@@ -69,7 +14,7 @@
     }
 
     .card-header {
-        background: linear-gradient(135deg, #3498DB, #2980B9);
+        background: linear-gradient(135deg, #F39C12, #E67E22);
         color: white;
         font-weight: 600;
         border-radius: 15px 15px 0 0 !important;
@@ -87,9 +32,9 @@
         border-radius: 20px;
         padding: 30px;
         box-shadow:
-            0 10px 40px rgba(52, 152, 219, 0.15),
+            0 10px 40px rgba(243, 156, 18, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        border: 2px solid rgba(52, 152, 219, 0.2);
+        border: 2px solid rgba(243, 156, 18, 0.2);
         display: flex;
         align-items: center;
         gap: 25px;
@@ -101,7 +46,7 @@
     .lab-counter-card:hover {
         transform: translateY(-5px);
         box-shadow:
-            0 15px 50px rgba(52, 152, 219, 0.25),
+            0 15px 50px rgba(243, 156, 18, 0.25),
             inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
@@ -111,25 +56,34 @@
         right: -50px;
         width: 200px;
         height: 200px;
-        background: radial-gradient(circle, rgba(52, 152, 219, 0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(243, 156, 18, 0.1) 0%, transparent 70%);
         border-radius: 50%;
         animation: pulse 4s ease-in-out infinite;
     }
 
     @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.3; }
+
+        0%,
+        100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+
+        50% {
+            transform: scale(1.1);
+            opacity: 0.3;
+        }
     }
 
     .counter-icon {
         width: 80px;
         height: 80px;
-        background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+        background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
         border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
         position: relative;
         z-index: 1;
     }
@@ -141,8 +95,15 @@
     }
 
     @keyframes iconFloat {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-5px);
+        }
     }
 
     .counter-content {
@@ -169,18 +130,18 @@
         font-family: 'Courier New', monospace;
         font-size: 3.5rem;
         font-weight: 900;
-        background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+        background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         letter-spacing: 3px;
-        text-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
+        text-shadow: 0 2px 10px rgba(243, 156, 18, 0.2);
         line-height: 1;
     }
 
     .counter-unit {
         font-size: 1.1rem;
-        color: #3498DB;
+        color: #F39C12;
         font-weight: 600;
         text-transform: lowercase;
     }
@@ -197,7 +158,7 @@
     .crud-card-header {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         padding: 25px 30px;
-        border-bottom: 3px solid #3498DB;
+        border-bottom: 3px solid #F39C12;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -213,7 +174,7 @@
 
     .header-left i {
         font-size: 1.5rem;
-        color: #3498DB;
+        color: #F39C12;
     }
 
     .header-left h3 {
@@ -224,13 +185,13 @@
     }
 
     .badge-count {
-        background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+        background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
         color: white;
         padding: 5px 15px;
         border-radius: 20px;
         font-weight: 700;
         font-size: 0.9rem;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
     }
 
     .search-box {
@@ -242,7 +203,7 @@
     .search-box i {
         position: absolute;
         left: 15px;
-        color: #3498DB;
+        color: #F39C12;
         font-size: 1rem;
     }
 
@@ -257,8 +218,8 @@
 
     .search-box input:focus {
         outline: none;
-        border-color: #3498DB;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        border-color: #F39C12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
     }
 
     .crud-card-body {
@@ -276,7 +237,7 @@
         background: #f8f9fa !important;
         display: table-header-group !important;
         visibility: visible !important;
-        border-bottom: 3px solid #3498DB !important;
+        border-bottom: 3px solid #F39C12 !important;
     }
 
     .modern-table thead th {
@@ -308,9 +269,9 @@
     }
 
     .table-row-hover:hover {
-        background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(41, 128, 185, 0.05) 100%) !important;
+        background: linear-gradient(135deg, rgba(243, 156, 18, 0.08) 0%, rgba(41, 128, 185, 0.05) 100%) !important;
         transform: scale(1.01);
-        box-shadow: 0 4px 20px rgba(52, 152, 219, 0.15);
+        box-shadow: 0 4px 20px rgba(243, 156, 18, 0.15);
         cursor: pointer;
     }
 
@@ -322,13 +283,13 @@
     }
 
     .id-badge {
-        background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+        background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
         color: white;
         padding: 5px 12px;
         border-radius: 8px;
         font-weight: 700;
         font-size: 0.9rem;
-        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
     }
 
     .prueba-imagen {
@@ -351,7 +312,7 @@
     }
 
     .prueba-imagen-placeholder i {
-        color: #3498DB;
+        color: #F39C12;
         font-size: 1.8rem;
     }
 
@@ -380,11 +341,11 @@
     }
 
     .btn-view {
-        background: linear-gradient(135deg, #3498DB, #2980B9);
+        background: linear-gradient(135deg, #F39C12, #E67E22);
     }
 
     .btn-view:hover {
-        background: linear-gradient(135deg, #2980B9, #21618C);
+        background: linear-gradient(135deg, #E67E22, #21618C);
     }
 
     .btn-edit {
@@ -448,7 +409,7 @@
     /* ========== PANEL DE FILTROS MODERNO ========== */
     .filtros-panel {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-bottom: 3px solid #3498DB;
+        border-bottom: 3px solid #F39C12;
         padding: 25px 30px;
         border-radius: 0;
     }
@@ -478,7 +439,7 @@
     }
 
     .filtro-label i {
-        color: #3498DB;
+        color: #F39C12;
         font-size: 1rem;
     }
 
@@ -495,14 +456,14 @@
     }
 
     .filtro-select:hover {
-        border-color: #3498DB;
-        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
+        border-color: #F39C12;
+        box-shadow: 0 2px 8px rgba(243, 156, 18, 0.15);
     }
 
     .filtro-select:focus {
         outline: none;
-        border-color: #3498DB;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        border-color: #F39C12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
     }
 
     .btn-limpiar-filtros {
@@ -531,14 +492,14 @@
         background: white;
         padding: 12px 20px;
         border-radius: 10px;
-        border-left: 4px solid #3498DB;
+        border-left: 4px solid #F39C12;
         font-size: 0.95rem;
         color: #2C3E50;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .filtros-stats strong {
-        color: #3498DB;
+        color: #F39C12;
         font-weight: 800;
         font-size: 1.1rem;
     }
@@ -554,194 +515,189 @@
     }
 </style>
 
-<div class="container-fluid">
-    <!-- Header Moderno -->
-    <div class="page-header">
-        <h1>
-            <i class="fas fa-vial"></i>
-            Gestión de Pruebas
-        </h1>
-        <p><i class="fas fa-flask"></i> Catálogo de pruebas disponibles: {{ pruebas|length }}</p>
-        <div class="header-actions">
-            <button class="btn btn-header" data-bs-toggle="modal" data-bs-target="#modalNuevo">
-                <i class="fas fa-plus"></i> Nueva Prueba
-            </button>
+<div class="content-wrapper" style="padding: 30px;">
+    <!-- Boton Nueva Prueba -->
+    <div class="mb-4">
+        <button class="btn btn-header" data-bs-toggle="modal" data-bs-target="#modalNuevo"
+            style="background: linear-gradient(135deg, #F39C12, #E67E22); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: 600; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);">
+            <i class="fas fa-plus"></i> Nueva Prueba
+        </button>
+    </div>
+
+    <!-- Contador Estilo Laboratorio -->
+    <div class="lab-counter-container">
+        <div class="lab-counter-card">
+            <div class="counter-icon">
+                <i class="fas fa-vial"></i>
+            </div>
+            <div class="counter-content">
+                <div class="counter-label">Catalogo de Pruebas Disponibles</div>
+                <div class="counter-display">
+                    <span class="counter-number">{{ "%03d"|format(pruebas|length) }}</span>
+                    <span class="counter-unit">pruebas</span>
+                </div>
+            </div>
+            <div class="counter-decoration"></div>
         </div>
     </div>
 
-    <!-- Contenedor del contenido -->
-    <div class="content-wrapper">
-        <!-- Contador Estilo Laboratorio -->
-        <div class="lab-counter-container">
-            <div class="lab-counter-card">
-                <div class="counter-icon">
-                    <i class="fas fa-vial"></i>
+    <!-- Tabla CRUD Moderna -->
+    <div class="modern-crud-card">
+        <div class="crud-card-header">
+            <div class="header-left">
+                <i class="fas fa-flask"></i>
+                <h3>Catálogo de Pruebas</h3>
+                <span class="badge-count">{{ pruebas|length }}</span>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchPruebas" placeholder="Buscar prueba...">
                 </div>
-                <div class="counter-content">
-                    <div class="counter-label">Catálogo de Pruebas Disponibles</div>
-                    <div class="counter-display">
-                        <span class="counter-number">{{ "%03d"|format(pruebas|length) }}</span>
-                        <span class="counter-unit">pruebas</span>
-                    </div>
-                </div>
-                <div class="counter-decoration"></div>
             </div>
         </div>
 
-        <!-- Tabla CRUD Moderna -->
-        <div class="modern-crud-card">
-            <div class="crud-card-header">
-                <div class="header-left">
-                    <i class="fas fa-flask"></i>
-                    <h3>Catálogo de Pruebas</h3>
-                    <span class="badge-count">{{ pruebas|length }}</span>
-                </div>
-                <div class="header-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchPruebas" placeholder="Buscar prueba...">
-                    </div>
-                </div>
-            </div>
-
-            <!-- PANEL DE FILTROS MODERNO -->
-            <div class="filtros-panel">
-                <div class="filtros-container">
-                    <div class="filtro-item">
-                        <label class="filtro-label">
-                            <i class="fas fa-layer-group"></i> Categoría
-                        </label>
-                        <select id="filtroCategoría" class="filtro-select">
-                            <option value="todas">📋 Todas las categorías</option>
-                            {% set categorias = pruebas | map(attribute='categoria') | unique | list %}
-                            {% for categoria in categorias | sort %}
-                            <option value="{{ categoria }}">{{ categoria }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="filtro-item">
-                        <label class="filtro-label">
-                            <i class="fas fa-list-ol"></i> Mostrar
-                        </label>
-                        <select id="filtroMostrar" class="filtro-select">
-                            <option value="todas">Todas las pruebas</option>
-                            <option value="10">Top 10 últimas</option>
-                            <option value="25">Top 25 últimas</option>
-                            <option value="50">Top 50 últimas</option>
-                            <option value="100">Top 100 últimas</option>
-                        </select>
-                    </div>
-
-                    <div class="filtro-item">
-                        <label class="filtro-label">
-                            <i class="fas fa-sort"></i> Ordenar por ID
-                        </label>
-                        <select id="filtroOrden" class="filtro-select">
-                            <option value="asc">⬆️ Ascendente (1 → última)</option>
-                            <option value="desc">⬇️ Descendente (última → 1)</option>
-                        </select>
-                    </div>
-
-                    <div class="filtro-item">
-                        <button class="btn-limpiar-filtros" onclick="limpiarFiltros()">
-                            <i class="fas fa-redo"></i> Limpiar Filtros
-                        </button>
-                    </div>
+        <!-- PANEL DE FILTROS MODERNO -->
+        <div class="filtros-panel">
+            <div class="filtros-container">
+                <div class="filtro-item">
+                    <label class="filtro-label">
+                        <i class="fas fa-layer-group"></i> Categoría
+                    </label>
+                    <select id="filtroCategoría" class="filtro-select">
+                        <option value="todas">📋 Todas las categorías</option>
+                        {% set categorias = pruebas | map(attribute='categoria') | unique | list %}
+                        {% for categoria in categorias | sort %}
+                        <option value="{{ categoria }}">{{ categoria }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
-                <div class="filtros-stats">
-                    <span id="filtrosStats">Mostrando <strong>{{ pruebas|length }}</strong> pruebas</span>
+                <div class="filtro-item">
+                    <label class="filtro-label">
+                        <i class="fas fa-list-ol"></i> Mostrar
+                    </label>
+                    <select id="filtroMostrar" class="filtro-select">
+                        <option value="todas">Todas las pruebas</option>
+                        <option value="10">Top 10 últimas</option>
+                        <option value="25">Top 25 últimas</option>
+                        <option value="50">Top 50 últimas</option>
+                        <option value="100">Top 100 últimas</option>
+                    </select>
+                </div>
+
+                <div class="filtro-item">
+                    <label class="filtro-label">
+                        <i class="fas fa-sort"></i> Ordenar por ID
+                    </label>
+                    <select id="filtroOrden" class="filtro-select">
+                        <option value="asc">⬆️ Ascendente (1 → última)</option>
+                        <option value="desc">⬇️ Descendente (última → 1)</option>
+                    </select>
+                </div>
+
+                <div class="filtro-item">
+                    <button class="btn-limpiar-filtros" onclick="limpiarFiltros()">
+                        <i class="fas fa-redo"></i> Limpiar Filtros
+                    </button>
                 </div>
             </div>
 
-            <div class="crud-card-body">
-                <div class="table-responsive">
-                    <table class="table modern-table">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-hashtag"></i> ID</th>
-                                <th><i class="fas fa-image"></i> Imagen</th>
-                                <th><i class="fas fa-flask"></i> Nombre de la Prueba</th>
-                                <th><i class="fas fa-tag"></i> Categoría</th>
-                                <th><i class="fas fa-coins"></i> Precio (Bs.)</th>
-                                <th class="text-center"><i class="fas fa-cog"></i> Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaPruebas">
-                            {% for p in pruebas %}
-                            <tr class="table-row-hover">
-                                <td><span class="id-badge">{{ p.id }}</span></td>
-                                <td>
-                                    {% if p.imagen %}
-                                    <img src="{{ url_for('static', filename='uploads/pruebas/' + p.imagen) }}"
-                                         alt="{{ p.nombre }}"
-                                         class="prueba-imagen">
-                                    {% else %}
-                                    <div class="prueba-imagen-placeholder">
-                                        <i class="fas fa-flask"></i>
-                                    </div>
-                                    {% endif %}
-                                </td>
-                                <td><strong>{{ p.nombre }}</strong></td>
-                                <td>
-                                    <span class="badge bg-info">
-                                        {{ p.categoria or 'General' }}
-                                    </span>
-                                </td>
-                                <td><strong>Bs. {{ "%.2f"|format(p.precio) }}</strong></td>
-                                <td class="text-center">
-                                    <div class="btn-group-modern">
-                                        <button class="btn-modern btn-view" onclick="verPrueba({{ p.id }})" title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn-modern btn-edit" onclick="editarPrueba({{ p.id }})" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn-modern btn-delete" onclick="confirmarEliminarPrueba({{ p.id }}, '{{ p.nombre }}')" title="Eliminar">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="6">
-                                    <div class="empty-state-modern">
-                                        <i class="fas fa-vial"></i>
-                                        <p>No hay pruebas registradas</p>
-                                        <button class="btn btn-header" data-bs-toggle="modal" data-bs-target="#modalNuevo">
-                                            <i class="fas fa-plus"></i> Agregar Primera Prueba
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="filtros-stats">
+                <span id="filtrosStats">Mostrando <strong>{{ pruebas|length }}</strong> pruebas</span>
+            </div>
+        </div>
+
+        <div class="crud-card-body">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-image"></i> Imagen</th>
+                            <th><i class="fas fa-flask"></i> Nombre de la Prueba</th>
+                            <th><i class="fas fa-tag"></i> Categoría</th>
+                            <th><i class="fas fa-coins"></i> Precio (Bs.)</th>
+                            <th class="text-center"><i class="fas fa-cog"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPruebas">
+                        {% for p in pruebas %}
+                        <tr class="table-row-hover">
+                            <td><span class="id-badge">{{ p.id }}</span></td>
+                            <td>
+                                {% if p.imagen %}
+                                <img src="{{ url_for('static', filename='uploads/pruebas/' + p.imagen) }}"
+                                    alt="{{ p.nombre }}" class="prueba-imagen">
+                                {% else %}
+                                <div class="prueba-imagen-placeholder">
+                                    <i class="fas fa-flask"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ p.nombre }}</strong></td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ p.categoria or 'General' }}
+                                </span>
+                            </td>
+                            <td><strong>Bs. {{ "%.2f"|format(p.precio) }}</strong></td>
+                            <td class="text-center">
+                                <div class="btn-group-modern">
+                                    <button class="btn-modern btn-view" onclick="verPrueba({{ p.id }})"
+                                        title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn-modern btn-edit" onclick="editarPrueba({{ p.id }})"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-modern btn-delete"
+                                        onclick="confirmarEliminarPrueba({{ p.id }}, '{{ p.nombre }}')"
+                                        title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state-modern">
+                                    <i class="fas fa-vial"></i>
+                                    <p>No hay pruebas registradas</p>
+                                    <button class="btn btn-header" data-bs-toggle="modal" data-bs-target="#modalNuevo">
+                                        <i class="fas fa-plus"></i> Agregar Primera Prueba
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
+</div>
 
 <script>
-// Búsqueda en tiempo real
-document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#tablaPruebas tr');
+    // Búsqueda en tiempo real
+    document.getElementById('searchPruebas')?.addEventListener('keyup', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#tablaPruebas tr');
 
-    rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
     });
-});
 </script>
 
 <div class="modal fade" id="modalNuevo" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #3498DB, #2980B9); color: white;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #F39C12, #E67E22); color: white;">
                 <h5><i class="fas fa-vial"></i> Registrar Nueva Prueba</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -751,17 +707,19 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label"><i class="fas fa-flask"></i> Nombre de la Prueba</label>
-                                <input type="text" class="form-control" name="nombre" required placeholder="Ej: Hemograma Completo">
+                                <input type="text" class="form-control" name="nombre" required
+                                    placeholder="Ej: Hemograma Completo">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label"><i class="fas fa-tags"></i> Categoría</label>
-                                <input type="text" class="form-control" name="categoria" list="categoriasList" placeholder="Seleccione o escriba una categoría" autocomplete="off">
+                                <input type="text" class="form-control" name="categoria" list="categoriasList"
+                                    placeholder="Seleccione o escriba una categoría" autocomplete="off">
                                 <datalist id="categoriasList">
                                     {% for cat in categorias %}
                                     <option value="{{ cat }}">
-                                    {% endfor %}
+                                        {% endfor %}
                                 </datalist>
                                 <small class="text-muted">Seleccione una existente o escriba una nueva</small>
                             </div>
@@ -769,13 +727,15 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-align-left"></i> Descripción</label>
-                        <textarea class="form-control" name="descripcion" rows="3" placeholder="Descripción breve de la prueba"></textarea>
+                        <textarea class="form-control" name="descripcion" rows="3"
+                            placeholder="Descripción breve de la prueba"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label"><i class="fas fa-money-bill"></i> Precio (Bolivianos)</label>
-                                <input type="number" class="form-control" name="precio" step="0.01" min="0" placeholder="0.00">
+                                <input type="number" class="form-control" name="precio" step="0.01" min="0"
+                                    placeholder="0.00">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -804,40 +764,49 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
 <div class="modal fade" id="modalVer" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #3498DB, #2980B9); color: white;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #F39C12, #E67E22); color: white;">
                 <h5><i class="fas fa-info-circle"></i> Detalles de la Prueba</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-4 text-center">
-                        <div id="verImagenContainer" style="width: 100%; height: 200px; background: #E8F5F1; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        <div id="verImagenContainer"
+                            style="width: 100%; height: 200px; background: #E8F5F1; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
                             <i class="fas fa-flask fa-3x" style="color: #1ABC9C;"></i>
                         </div>
-                        <img id="verImagen" src="" alt="Imagen de la prueba" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; display: none; margin-bottom: 15px;">
+                        <img id="verImagen" src="" alt="Imagen de la prueba"
+                            style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; display: none; margin-bottom: 15px;">
                     </div>
                     <div class="col-md-8">
                         <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <div class="row mb-3">
-                                    <div class="col-4"><strong><i class="fas fa-hashtag text-primary"></i> ID:</strong></div>
+                                    <div class="col-4"><strong><i class="fas fa-hashtag text-primary"></i> ID:</strong>
+                                    </div>
                                     <div class="col-8" id="verID">-</div>
                                 </div>
                                 <div class="row mb-3">
-                                    <div class="col-4"><strong><i class="fas fa-flask text-success"></i> Nombre:</strong></div>
+                                    <div class="col-4"><strong><i class="fas fa-flask text-success"></i>
+                                            Nombre:</strong></div>
                                     <div class="col-8" id="verNombre">-</div>
                                 </div>
                                 <div class="row mb-3">
-                                    <div class="col-4"><strong><i class="fas fa-tag text-warning"></i> Categoría:</strong></div>
-                                    <div class="col-8"><span class="badge" style="background:#1ABC9C" id="verCategoria">-</span></div>
+                                    <div class="col-4"><strong><i class="fas fa-tag text-warning"></i>
+                                            Categoría:</strong></div>
+                                    <div class="col-8"><span class="badge" style="background:#1ABC9C"
+                                            id="verCategoria">-</span></div>
                                 </div>
                                 <div class="row mb-3">
-                                    <div class="col-4"><strong><i class="fas fa-coins text-info"></i> Precio:</strong></div>
+                                    <div class="col-4"><strong><i class="fas fa-coins text-info"></i> Precio:</strong>
+                                    </div>
                                     <div class="col-8" id="verPrecio">-</div>
                                 </div>
                                 <div class="row mb-3">
-                                    <div class="col-12"><strong><i class="fas fa-align-left text-secondary"></i> Descripción:</strong></div>
-                                    <div class="col-12 mt-2" id="verDescripcion" style="background: #F8F9FA; padding: 15px; border-radius: 8px;">-</div>
+                                    <div class="col-12"><strong><i class="fas fa-align-left text-secondary"></i>
+                                            Descripción:</strong></div>
+                                    <div class="col-12 mt-2" id="verDescripcion"
+                                        style="background: #F8F9FA; padding: 15px; border-radius: 8px;">-</div>
                                 </div>
                             </div>
                         </div>
@@ -845,7 +814,8 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
+                    Cerrar</button>
             </div>
         </div>
     </div>
@@ -867,7 +837,8 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                     <div class="text-center mb-3" id="editImagenPreview" style="display: none;">
                         <label class="form-label"><i class="fas fa-image"></i> Imagen Actual</label>
                         <div>
-                            <img id="editImagenActual" src="" alt="Imagen actual" style="max-width: 200px; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid #E8F5F1;">
+                            <img id="editImagenActual" src="" alt="Imagen actual"
+                                style="max-width: 200px; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid #E8F5F1;">
                         </div>
                     </div>
 
@@ -881,7 +852,8 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label"><i class="fas fa-tags"></i> Categoría</label>
-                                <input type="text" class="form-control" name="categoria" id="editCategoria" list="categoriasList" autocomplete="off">
+                                <input type="text" class="form-control" name="categoria" id="editCategoria"
+                                    list="categoriasList" autocomplete="off">
                                 <small class="text-muted">Seleccione una existente o escriba una nueva</small>
                             </div>
                         </div>
@@ -894,7 +866,8 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label"><i class="fas fa-money-bill"></i> Precio (Bolivianos)</label>
-                                <input type="number" class="form-control" name="precio" id="editPrecio" step="0.01" min="0">
+                                <input type="number" class="form-control" name="precio" id="editPrecio" step="0.01"
+                                    min="0">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -907,7 +880,8 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
+                        Cancelar</button>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
                 </div>
             </form>
@@ -933,7 +907,8 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
                     <h5 class="text-center text-danger"><strong id="eliminarPruebaNombre"></strong></h5>
                     <div class="card border-warning bg-light mt-3">
                         <div class="card-body">
-                            <p class="mb-0"><i class="fas fa-info-circle text-warning"></i> Se eliminará permanentemente del sistema.</p>
+                            <p class="mb-0"><i class="fas fa-info-circle text-warning"></i> Se eliminará permanentemente
+                                del sistema.</p>
                         </div>
                     </div>
                 </div>
@@ -951,160 +926,160 @@ document.getElementById('searchPruebas')?.addEventListener('keyup', function(e) 
 </div>
 
 <script>
-// Ver detalles de prueba
-function verPrueba(id) {
-    fetch(`/prueba/${id}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('verID').textContent = data.id;
-            document.getElementById('verNombre').textContent = data.nombre;
-            document.getElementById('verCategoria').textContent = data.categoria || 'General';
-            document.getElementById('verPrecio').textContent = 'Bs. ' + parseFloat(data.precio).toFixed(2);
-            document.getElementById('verDescripcion').textContent = data.descripcion || 'Sin descripción';
+    // Ver detalles de prueba
+    function verPrueba(id) {
+        fetch(`/prueba/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('verID').textContent = data.id;
+                document.getElementById('verNombre').textContent = data.nombre;
+                document.getElementById('verCategoria').textContent = data.categoria || 'General';
+                document.getElementById('verPrecio').textContent = 'Bs. ' + parseFloat(data.precio).toFixed(2);
+                document.getElementById('verDescripcion').textContent = data.descripcion || 'Sin descripción';
 
-            // Mostrar imagen si existe
-            if (data.imagen) {
-                document.getElementById('verImagen').src = '/static/uploads/pruebas/' + data.imagen;
-                document.getElementById('verImagen').style.display = 'block';
-                document.getElementById('verImagenContainer').style.display = 'none';
-            } else {
-                document.getElementById('verImagen').style.display = 'none';
-                document.getElementById('verImagenContainer').style.display = 'flex';
-            }
+                // Mostrar imagen si existe
+                if (data.imagen) {
+                    document.getElementById('verImagen').src = '/static/uploads/pruebas/' + data.imagen;
+                    document.getElementById('verImagen').style.display = 'block';
+                    document.getElementById('verImagenContainer').style.display = 'none';
+                } else {
+                    document.getElementById('verImagen').style.display = 'none';
+                    document.getElementById('verImagenContainer').style.display = 'flex';
+                }
 
-            new bootstrap.Modal(document.getElementById('modalVer')).show();
-        })
-        .catch(error => {
-            alert('Error al cargar los datos de la prueba');
-            console.error('Error:', error);
-        });
-}
-
-// Editar prueba
-function editarPrueba(id) {
-    fetch(`/prueba/${id}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('editID').value = data.id;
-            document.getElementById('editNombre').value = data.nombre;
-            document.getElementById('editCategoria').value = data.categoria || '';
-            document.getElementById('editDescripcion').value = data.descripcion || '';
-            document.getElementById('editPrecio').value = data.precio;
-
-            // Mostrar preview de imagen actual si existe
-            if (data.imagen) {
-                document.getElementById('editImagenActual').src = '/static/uploads/pruebas/' + data.imagen;
-                document.getElementById('editImagenPreview').style.display = 'block';
-            } else {
-                document.getElementById('editImagenPreview').style.display = 'none';
-            }
-
-            document.getElementById('formEditar').action = `/prueba/editar/${id}`;
-            new bootstrap.Modal(document.getElementById('modalEditar')).show();
-        })
-        .catch(error => {
-            alert('Error al cargar los datos de la prueba');
-            console.error('Error:', error);
-        });
-}
-
-// Confirmar eliminar prueba
-function confirmarEliminarPrueba(id, nombre) {
-    document.getElementById('eliminarPruebaNombre').textContent = nombre;
-    document.getElementById('formEliminarPrueba').action = `/prueba/eliminar/${id}`;
-    new bootstrap.Modal(document.getElementById('modalEliminarPrueba')).show();
-}
-
-// ========== SISTEMA DE FILTROS MODERNOS ==========
-let todasLasFilas = [];
-
-// Guardar todas las filas al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    const tabla = document.getElementById('tablaPruebas');
-    todasLasFilas = Array.from(tabla.getElementsByTagName('tr'));
-
-    // Agregar event listeners a los filtros
-    document.getElementById('filtroCategoría').addEventListener('change', aplicarFiltros);
-    document.getElementById('filtroMostrar').addEventListener('change', aplicarFiltros);
-    document.getElementById('filtroOrden').addEventListener('change', aplicarFiltros);
-});
-
-function aplicarFiltros() {
-    const categoriaSeleccionada = document.getElementById('filtroCategoría').value;
-    const mostrarSeleccionado = document.getElementById('filtroMostrar').value;
-    const ordenSeleccionado = document.getElementById('filtroOrden').value;
-    const textoBusqueda = document.getElementById('searchPruebas').value.toLowerCase();
-
-    let filasFiltradas = [...todasLasFilas];
-
-    // Filtro por categoría
-    if (categoriaSeleccionada !== 'todas') {
-        filasFiltradas = filasFiltradas.filter(fila => {
-            const categoriaBadge = fila.querySelector('.badge.bg-info');
-            if (!categoriaBadge) return false;
-            return categoriaBadge.textContent.trim() === categoriaSeleccionada;
-        });
+                new bootstrap.Modal(document.getElementById('modalVer')).show();
+            })
+            .catch(error => {
+                alert('Error al cargar los datos de la prueba');
+                console.error('Error:', error);
+            });
     }
 
-    // Filtro por búsqueda de texto
-    if (textoBusqueda) {
-        filasFiltradas = filasFiltradas.filter(fila => {
-            const texto = fila.textContent.toLowerCase();
-            return texto.includes(textoBusqueda);
-        });
+    // Editar prueba
+    function editarPrueba(id) {
+        fetch(`/prueba/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editID').value = data.id;
+                document.getElementById('editNombre').value = data.nombre;
+                document.getElementById('editCategoria').value = data.categoria || '';
+                document.getElementById('editDescripcion').value = data.descripcion || '';
+                document.getElementById('editPrecio').value = data.precio;
+
+                // Mostrar preview de imagen actual si existe
+                if (data.imagen) {
+                    document.getElementById('editImagenActual').src = '/static/uploads/pruebas/' + data.imagen;
+                    document.getElementById('editImagenPreview').style.display = 'block';
+                } else {
+                    document.getElementById('editImagenPreview').style.display = 'none';
+                }
+
+                document.getElementById('formEditar').action = `/prueba/editar/${id}`;
+                new bootstrap.Modal(document.getElementById('modalEditar')).show();
+            })
+            .catch(error => {
+                alert('Error al cargar los datos de la prueba');
+                console.error('Error:', error);
+            });
     }
 
-    // Ordenar por ID
-    filasFiltradas.sort((a, b) => {
-        const idA = parseInt(a.querySelector('.id-badge').textContent);
-        const idB = parseInt(b.querySelector('.id-badge').textContent);
+    // Confirmar eliminar prueba
+    function confirmarEliminarPrueba(id, nombre) {
+        document.getElementById('eliminarPruebaNombre').textContent = nombre;
+        document.getElementById('formEliminarPrueba').action = `/prueba/eliminar/${id}`;
+        new bootstrap.Modal(document.getElementById('modalEliminarPrueba')).show();
+    }
 
-        if (ordenSeleccionado === 'asc') {
-            return idA - idB;
-        } else {
-            return idB - idA;
-        }
+    // ========== SISTEMA DE FILTROS MODERNOS ==========
+    let todasLasFilas = [];
+
+    // Guardar todas las filas al cargar la página
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabla = document.getElementById('tablaPruebas');
+        todasLasFilas = Array.from(tabla.getElementsByTagName('tr'));
+
+        // Agregar event listeners a los filtros
+        document.getElementById('filtroCategoría').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroMostrar').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroOrden').addEventListener('change', aplicarFiltros);
     });
 
-    // Limitar cantidad a mostrar (Top N)
-    if (mostrarSeleccionado !== 'todas') {
-        const limite = parseInt(mostrarSeleccionado);
-        filasFiltradas = filasFiltradas.slice(0, limite);
+    function aplicarFiltros() {
+        const categoriaSeleccionada = document.getElementById('filtroCategoría').value;
+        const mostrarSeleccionado = document.getElementById('filtroMostrar').value;
+        const ordenSeleccionado = document.getElementById('filtroOrden').value;
+        const textoBusqueda = document.getElementById('searchPruebas').value.toLowerCase();
+
+        let filasFiltradas = [...todasLasFilas];
+
+        // Filtro por categoría
+        if (categoriaSeleccionada !== 'todas') {
+            filasFiltradas = filasFiltradas.filter(fila => {
+                const categoriaBadge = fila.querySelector('.badge.bg-info');
+                if (!categoriaBadge) return false;
+                return categoriaBadge.textContent.trim() === categoriaSeleccionada;
+            });
+        }
+
+        // Filtro por búsqueda de texto
+        if (textoBusqueda) {
+            filasFiltradas = filasFiltradas.filter(fila => {
+                const texto = fila.textContent.toLowerCase();
+                return texto.includes(textoBusqueda);
+            });
+        }
+
+        // Ordenar por ID
+        filasFiltradas.sort((a, b) => {
+            const idA = parseInt(a.querySelector('.id-badge').textContent);
+            const idB = parseInt(b.querySelector('.id-badge').textContent);
+
+            if (ordenSeleccionado === 'asc') {
+                return idA - idB;
+            } else {
+                return idB - idA;
+            }
+        });
+
+        // Limitar cantidad a mostrar (Top N)
+        if (mostrarSeleccionado !== 'todas') {
+            const limite = parseInt(mostrarSeleccionado);
+            filasFiltradas = filasFiltradas.slice(0, limite);
+        }
+
+        // Actualizar tabla
+        const tabla = document.getElementById('tablaPruebas');
+        tabla.innerHTML = '';
+        filasFiltradas.forEach(fila => tabla.appendChild(fila));
+
+        // Actualizar estadísticas
+        actualizarEstadisticas(filasFiltradas.length);
     }
 
-    // Actualizar tabla
-    const tabla = document.getElementById('tablaPruebas');
-    tabla.innerHTML = '';
-    filasFiltradas.forEach(fila => tabla.appendChild(fila));
+    function actualizarEstadisticas(cantidad) {
+        const stats = document.getElementById('filtrosStats');
+        const total = todasLasFilas.length;
 
-    // Actualizar estadísticas
-    actualizarEstadisticas(filasFiltradas.length);
-}
-
-function actualizarEstadisticas(cantidad) {
-    const stats = document.getElementById('filtrosStats');
-    const total = todasLasFilas.length;
-
-    if (cantidad === total) {
-        stats.innerHTML = `Mostrando <strong>${cantidad}</strong> pruebas`;
-    } else {
-        stats.innerHTML = `Mostrando <strong>${cantidad}</strong> de <strong>${total}</strong> pruebas`;
+        if (cantidad === total) {
+            stats.innerHTML = `Mostrando <strong>${cantidad}</strong> pruebas`;
+        } else {
+            stats.innerHTML = `Mostrando <strong>${cantidad}</strong> de <strong>${total}</strong> pruebas`;
+        }
     }
-}
 
-function limpiarFiltros() {
-    // Resetear todos los filtros
-    document.getElementById('filtroCategoría').value = 'todas';
-    document.getElementById('filtroMostrar').value = 'todas';
-    document.getElementById('filtroOrden').value = 'asc';
-    document.getElementById('searchPruebas').value = '';
+    function limpiarFiltros() {
+        // Resetear todos los filtros
+        document.getElementById('filtroCategoría').value = 'todas';
+        document.getElementById('filtroMostrar').value = 'todas';
+        document.getElementById('filtroOrden').value = 'asc';
+        document.getElementById('searchPruebas').value = '';
 
-    // Aplicar filtros (esto mostrará todas las pruebas)
-    aplicarFiltros();
-}
+        // Aplicar filtros (esto mostrará todas las pruebas)
+        aplicarFiltros();
+    }
 
-// Conectar el buscador con el sistema de filtros
-document.getElementById('searchPruebas').addEventListener('keyup', aplicarFiltros);
+    // Conectar el buscador con el sistema de filtros
+    document.getElementById('searchPruebas').addEventListener('keyup', aplicarFiltros);
 </script>
 
 {% endblock %}

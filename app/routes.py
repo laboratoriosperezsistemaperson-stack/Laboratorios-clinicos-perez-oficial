@@ -1,7 +1,7 @@
 ﻿from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, jsonify
 from flask_login import login_required, current_user
 from app import db
-from app.models import Paciente, Resultado, Prueba
+from app.models import Paciente, Resultado, Prueba, Publicacion, FotoGaleria, ConfiguracionLab
 from app.utils import admin_required
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
@@ -83,69 +83,62 @@ def generar_numero_orden():
     numero_orden = f"{timestamp}-{contador+1:03d}"
     return numero_orden
 
-def guardar_pdf_con_backup(archivo, numero_orden):
+def guardar_pdf_con_backup(archivo, numero_orden, paciente):
     """
-    Guarda un PDF de forma SÚPER ROBUSTA con:
-    - Nombre único basado en timestamp
-    - Verificación de integridad
+    Guarda un PDF de forma ROBUSTA:
+    - Carpeta específica del paciente: uploads/pacientes/CI_Nombre/
     - Backup automático
-    - Manejo de errores
-
-    Returns:
-        tuple: (filename, filepath, backup_path) o (None, None, None) si falla
     """
     try:
         # 1. Validar archivo
         if not archivo or not archivo.filename:
             raise ValueError("Archivo no válido")
-
         if not archivo.filename.lower().endswith('.pdf'):
             raise ValueError("Solo se permiten archivos PDF")
 
-        # 2. Generar nombre único con timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+        # 2. Preparar rutas
+        # Nombre de carpeta amigable: CI_Nombre (limpio)
+        nombre_carpeta = secure_filename(f"{paciente.ci}_{paciente.nombre}")
+        paciente_dir = os.path.join(UPLOAD_DIR, 'pacientes', nombre_carpeta)
+        
+        # Crear directorios
+        os.makedirs(paciente_dir, exist_ok=True)
+        os.makedirs(BACKUP_DIR, exist_ok=True)
+
+        # 3. Generar nombre único
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         nombre_base = secure_filename(archivo.filename.replace('.pdf', ''))
         filename = f"{numero_orden}_{timestamp}_{nombre_base}.pdf"
 
-        # 3. Crear directorios si no existen
-        os.makedirs(UPLOAD_DIR, exist_ok=True)
-        os.makedirs(BACKUP_DIR, exist_ok=True)
-
-        # 4. Guardar archivo principal
-        filepath = os.path.join(UPLOAD_DIR, filename)
+        # 4. Guardar archivo en carpeta del paciente
+        filepath = os.path.join(paciente_dir, filename)
         archivo.save(filepath)
 
-        # 5. Verificar que se guardó correctamente
-        if not os.path.exists(filepath):
-            raise Exception(f"Archivo no se guardó: {filepath}")
+        # 5. Generar PATH RELATIVO para la BD
+        # Guardamos: "pacientes/CI_Nombre/archivo.pdf"
+        relative_path = os.path.join('pacientes', nombre_carpeta, filename).replace('\\', '/')
 
-        file_size = os.path.getsize(filepath)
-        if file_size == 0:
-            os.remove(filepath)
-            raise Exception("Archivo PDF vacío")
+        # 6. Verify first save
+        if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
+            if os.path.exists(filepath): os.remove(filepath)
+            raise Exception("Error escribiendo archivo")
 
-        # 6. Crear BACKUP automático
+        # 7. Crear BACKUP (en carpeta central de backups o carpeta de trash del paciente?)
+        # User asked for: "si lo elimino... tenga una subcarpeta de eso... ahi se guardara"
+        # For now, keep a central backup just in case, or we can rely on soft-delete logic later.
+        # Let's keep central backup for redundancy as per original code.
         backup_path = os.path.join(BACKUP_DIR, filename)
         import shutil
         shutil.copy2(filepath, backup_path)
 
-        # 7. Verificar backup
-        if not os.path.exists(backup_path):
-            print(f"⚠ WARNING: Backup no se creó: {backup_path}")
-        else:
-            print(f"✓ BACKUP creado: {backup_path}")
-
-        print(f"✓ PDF guardado: {filepath} ({file_size} bytes)")
-
-        return filename, filepath, backup_path
+        print(f"✓ PDF guardado en: {filepath}")
+        return relative_path, filepath, backup_path
 
     except Exception as e:
         print(f"✗ Error guardando PDF: {str(e)}")
-        # Limpiar archivos parciales
+        # Clean up
         if 'filepath' in locals() and os.path.exists(filepath):
             os.remove(filepath)
-        if 'backup_path' in locals() and os.path.exists(backup_path):
-            os.remove(backup_path)
         return None, None, None
 
 def limpiar_archivo_huerfano(filename):
@@ -173,6 +166,32 @@ def index():
 def portal_resultados():
     return render_template('publico/portal_resultados.html')
 
+@main.route('/servicios')
+def servicios():
+    # Cargar publicaciones activas de la base de datos
+    publicaciones = Publicacion.query.filter_by(activo=True).order_by(Publicacion.orden.asc(), Publicacion.fecha_publicacion.desc()).all()
+    
+    # Cargar configuración
+    config_items = ConfiguracionLab.query.all()
+    configuracion = {item.clave: item.valor for item in config_items}
+    
+    return render_template('publico/servicios.html', publicaciones=publicaciones, config=configuracion)
+
+@main.route('/servicios/informacion')
+def servicios_info():
+    # Cargar configuración del laboratorio
+    config_items = ConfiguracionLab.query.all()
+    configuracion = {item.clave: item.valor for item in config_items}
+    
+    return render_template('publico/servicios_info.html', config=configuracion)
+
+@main.route('/servicios/fotos')
+def servicios_fotos():
+    # Cargar fotos activas de la galería
+    fotos = FotoGaleria.query.filter_by(activo=True).order_by(FotoGaleria.orden.asc(), FotoGaleria.fecha_subida.desc()).all()
+    
+    return render_template('publico/servicios_fotos.html', fotos=fotos)
+
 @main.route('/catalogo-pruebas')
 def catalogo_pruebas():
     # Obtener todas las pruebas ordenadas por categoría y nombre
@@ -192,10 +211,20 @@ def catalogo_pruebas():
 
 @main.route('/consultar-resultado', methods=['POST'])
 def consultar_resultado():
+    """
+    Consulta pública de resultados para pacientes.
+    - Solo busca resultados ACTIVOS (no eliminados)
+    - Funciona indefinidamente mientras el resultado no sea eliminado permanentemente
+    """
     ci = request.form.get('ci')
     codigo = request.form.get('codigo')
 
-    resultado = Resultado.query.filter_by(paciente_ci=ci, codigo_acceso=codigo).first()
+    # Solo buscar en resultados NO eliminados
+    resultado = Resultado.query.filter_by(
+        paciente_ci=ci, 
+        codigo_acceso=codigo,
+        eliminado=False
+    ).first()
 
     if resultado:
         return render_template('publico/ver_resultado.html', resultado=resultado)
@@ -267,6 +296,58 @@ def dashboard():
         if 0 <= pos < 6:
             resultados_data[pos] = total
 
+    # Preparar datos para exportación como JSON serializado
+    pacientes_lista = Paciente.query.order_by(Paciente.nombre).all()
+    all_pruebas = Prueba.query.all()
+    all_resultados = Resultado.query.all()
+    
+    import json
+    export_data = {
+        "pacientes": [
+            {
+                "id": p.id,
+                "nombre": p.nombre,
+                "ci": p.ci,
+                "telefono": p.telefono or '',
+                "email": p.email or '',
+                "fecha_registro": p.fecha_registro.strftime('%Y-%m-%d %H:%M') if p.fecha_registro else ''
+            } for p in pacientes_lista
+        ],
+        "pruebas": [
+            {
+                "id": pr.id,
+                "nombre": pr.nombre,
+                "categoria": pr.categoria or '',
+                "precio": float(pr.precio) if pr.precio else 0,
+                "descripcion": pr.descripcion or ''
+            } for pr in all_pruebas
+        ],
+        "resultados": [
+            {
+                "id": r.id,
+                "numero_orden": r.numero_orden,
+                "paciente_nombre": r.paciente_nombre,
+                "paciente_ci": r.paciente_ci,
+                "paciente_id": r.paciente_id,
+                "prueba_id": r.prueba_id,
+                "fecha_muestra": r.fecha_muestra.strftime('%Y-%m-%d') if r.fecha_muestra else '',
+                "codigo_acceso": r.codigo_acceso,
+                "tipo_laboratorio": r.prueba.nombre if r.prueba else 'General',
+                "eliminado": r.eliminado if hasattr(r, 'eliminado') else False,
+                "fecha_creacion": r.fecha_creacion.strftime('%Y-%m-%d') if r.fecha_creacion else ''
+            } for r in all_resultados
+        ],
+        "estadisticas": {
+            "totalPacientes": total_pacientes,
+            "totalResultados": total_resultados,
+            "totalPruebas": total_pruebas,
+            "pacientesEsteMes": pacientes_este_mes,
+            "resultadosEsteMes": resultados_este_mes
+        }
+    }
+    
+    export_data_json = json.dumps(export_data, ensure_ascii=False)
+
     return render_template('admin/dashboard.html',
                          total_pacientes=total_pacientes,
                          total_resultados=total_resultados,
@@ -276,7 +357,11 @@ def dashboard():
                          ultimos_meses=ultimos_meses,
                          pacientes_data=pacientes_data,
                          resultados_data=resultados_data,
-                         top_pruebas=top_pruebas)
+                         top_pruebas=top_pruebas,
+                         pacientes_lista=pacientes_lista,
+                         all_pruebas=all_pruebas,
+                         all_resultados=all_resultados,
+                         export_data_json=export_data_json)
 
 @main.route('/pacientes', methods=['GET', 'POST'])
 @admin_required
@@ -291,7 +376,20 @@ def admin_pacientes():
             )
             db.session.add(paciente)
             db.session.commit()
+            
+            # Crear carpeta del paciente inmediatamente
+            try:
+                from werkzeug.utils import secure_filename
+                nombre_carpeta = secure_filename(f"{paciente.ci}_{paciente.nombre}")
+                paciente_dir = os.path.join(UPLOAD_DIR, 'pacientes', nombre_carpeta)
+                os.makedirs(paciente_dir, exist_ok=True)
+                print(f"✓ Carpeta creada: {paciente_dir}")
+            except Exception as e:
+                print(f"⚠ Error creando carpeta: {e}")
+                
             flash('Paciente registrado exitosamente', 'success')
+            # Redirigir con parámetros para mostrar modal de éxito
+            return redirect(url_for('main.admin_pacientes', nuevo_exito=1, paciente_nombre=paciente.nombre))
         except Exception as e:
             flash(f'Error: {str(e)}', 'danger')
         return redirect(url_for('main.admin_pacientes'))
@@ -316,10 +414,40 @@ def ver_paciente(paciente_id):
 def editar_paciente(paciente_id):
     try:
         paciente = Paciente.query.get_or_404(paciente_id)
+        old_ci = paciente.ci
+        old_nombre = paciente.nombre
+        
         paciente.nombre = request.form['nombre']
         paciente.ci = request.form['ci']
         paciente.telefono = request.form.get('telefono')
         paciente.email = request.form.get('email')
+
+        # Si cambió nombre o CI, intentar renombrar carpeta
+        if old_ci != paciente.ci or old_nombre != paciente.nombre:
+             try:
+                 old_folder_name = secure_filename(f"{old_ci}_{old_nombre}")
+                 new_folder_name = secure_filename(f"{paciente.ci}_{paciente.nombre}")
+                 
+                 old_path = os.path.join(UPLOAD_DIR, 'pacientes', old_folder_name)
+                 new_path = os.path.join(UPLOAD_DIR, 'pacientes', new_folder_name)
+                 
+                 if os.path.exists(old_path):
+                     os.rename(old_path, new_path)
+                     print(f"Renombrado: {old_folder_name} -> {new_folder_name}")
+                     
+                     # Actualizar paths en BD para resultados de este paciente?
+                     # No es estrictamente necesario si usamos ruta relativa dinámica "pacientes/{ci}_{nombre}",
+                     # pero si guardamos la ruta completa relativa "pacientes/old/file.pdf", entonces sí.
+                     # Verifiquemos cómo guardamos: relative_path = os.path.join('pacientes', nombre_carpeta, filename)
+                     # SÍ, guardamos la ruta con el nombre de carpeta. HAY QUE ACTUALIZAR BD.
+                     
+                     resultados_p = Resultado.query.filter_by(paciente_id=paciente_id).all()
+                     for res in resultados_p:
+                         if res.archivo_pdf and old_folder_name in res.archivo_pdf:
+                             res.archivo_pdf = res.archivo_pdf.replace(old_folder_name, new_folder_name)
+                             
+             except Exception as e:
+                 print(f"Error renombrando carpeta: {e}")
 
         resultados = Resultado.query.filter_by(paciente_id=paciente_id).all()
         for resultado in resultados:
@@ -412,7 +540,8 @@ def admin_resultados():
             # ============ GUARDAR PDF CON BACKUP ============
             filename_guardado, filepath, backup_path = guardar_pdf_con_backup(
                 archivo,
-                numero_orden_generado
+                numero_orden_generado,
+                paciente
             )
 
             if not filename_guardado:
@@ -436,7 +565,8 @@ def admin_resultados():
                 paciente_ci=paciente.ci,
                 fecha_muestra=fecha_muestra,
                 archivo_pdf=filename_guardado,
-                codigo_acceso=codigo_acceso
+                codigo_acceso=codigo_acceso,
+                prueba_id=request.form.get('prueba_id') or None
             )
 
             db.session.add(resultado)
@@ -484,11 +614,22 @@ def admin_resultados():
             else:
                 flash(f'❌ Error al guardar: {error_msg}', 'danger')
 
-        return redirect(url_for('main.admin_resultados'))
+        return redirect(url_for('main.admin_resultados', 
+                              nuevo_exito=1, 
+                              paciente_id=paciente.id, 
+                              paciente_nombre=paciente.nombre))
     
-    resultados = Resultado.query.order_by(Resultado.fecha_creacion.desc()).all()
+    # Separar resultados activos y eliminados para tabs
+    resultados_activos = Resultado.query.filter_by(eliminado=False).order_by(Resultado.fecha_creacion.desc()).all()
+    resultados_eliminados = Resultado.query.filter_by(eliminado=True).order_by(Resultado.fecha_eliminacion.desc()).all()
     pacientes = Paciente.query.order_by(Paciente.nombre).all()
-    return render_template('admin/resultados.html', resultados=resultados, pacientes=pacientes)
+    pruebas = Prueba.query.order_by(Prueba.nombre).all()
+    
+    return render_template('admin/resultados.html', 
+                          resultados=resultados_activos,
+                          resultados_eliminados=resultados_eliminados,
+                          pacientes=pacientes, 
+                          pruebas=pruebas)
 
 @main.route('/descargar-credenciales-pdf/<int:resultado_id>')
 @admin_required
@@ -1059,17 +1200,24 @@ def eliminar_prueba(prueba_id):
 def descargar(resultado_id):
     resultado = Resultado.query.get_or_404(resultado_id)
     if resultado.archivo_pdf:
-        # Construir ruta absoluta correcta usando UPLOAD_DIR
-        pdf_path = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
+        # Intentar varias rutas posibles para robustez
+        possible_paths = [
+            os.path.join(UPLOAD_DIR, resultado.archivo_pdf), # Estándar actual (solo filename)
+            os.path.join(BASE_DIR, resultado.archivo_pdf),   # Ruta relativa antigua
+            resultado.archivo_pdf                            # Ruta absoluta
+        ]
 
-        # Verificar que el archivo existe
-        if not os.path.exists(pdf_path):
-            flash(f'El archivo PDF no se encuentra en el servidor: {resultado.archivo_pdf}', 'danger')
-            return redirect(url_for('main.admin_resultados'))
+        # Verificar si alguna existe
+        for pdf_path in possible_paths:
+             if os.path.exists(pdf_path):
+                 return send_file(pdf_path, as_attachment=True)
 
-        return send_file(pdf_path, as_attachment=True)
+        # Si llegamos aquí, no se encontró
+        flash(f'El archivo PDF no se encuentra físicamente: {resultado.archivo_pdf}', 'danger')
+        print(f"❌ PDF no encontrado. Buscado en: {possible_paths}")
+        return redirect(url_for('main.admin_resultados'))
 
-    flash('No hay archivo PDF disponible', 'warning')
+    flash('No hay archivo PDF asignado a este resultado', 'warning')
     return redirect(url_for('main.admin_resultados'))
 
 @main.route('/descargar-resultado-publico/<int:resultado_id>')
@@ -1140,7 +1288,123 @@ def descargar_resultado_publico(resultado_id):
 @admin_required
 def eliminar_resultado(resultado_id):
     """
-    Elimina un resultado individual con sus archivos (principal y backup)
+    SOFT-DELETE: Mueve el resultado a la papelera (eliminados)
+    - Mueve archivos a carpeta 'papelera/CI_Nombre/'
+    - El resultado NO se elimina permanentemente de la BD (solo flag eliminado=True)
+    """
+    try:
+        resultado = Resultado.query.get_or_404(resultado_id)
+        
+        # Soft-delete: Marcar como eliminado en BD
+        resultado.eliminado = True
+        resultado.fecha_eliminacion = datetime.now()
+        resultado.eliminado_por = current_user.username if current_user and hasattr(current_user, 'username') else 'admin'
+        
+        # Mover archivo a la papelera (si existe)
+        if resultado.archivo_pdf:
+            path_actual = None
+            # Intentar localizar el archivo (puede estar en uploads/ o en uploads/pacientes/...)
+            # Ruta relativa almacenada en BD: puede ser "pacientes/..." o "filename.pdf" (antiguo)
+            
+            fullname = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
+            if os.path.exists(fullname):
+                 path_actual = fullname
+            
+            if path_actual:
+                # Crear carpeta de papelera del paciente
+                nombre_carpeta = secure_filename(f"{resultado.paciente_ci}_{resultado.paciente_nombre}")
+                papelera_dir = os.path.join(UPLOAD_DIR, 'papelera', nombre_carpeta)
+                os.makedirs(papelera_dir, exist_ok=True)
+                
+                # Nombre de archivo
+                filename = os.path.basename(path_actual)
+                destino = os.path.join(papelera_dir, filename)
+                
+                import shutil
+                shutil.move(path_actual, destino)
+                print(f"🗑 Archivo movido a papelera: {destino}")
+                
+                # Actualizar ruta en BD para apuntar a la papelera (opcional, o mantener original si restauramos?)
+                # Si restauramos, deberíamos saber volver a ponerlo donde estaba. 
+                # Mejor idea: mantener ruta original en un campo temporal? O simplemente recalcularla al restaurar.
+                # Al restaurar, el sistema usará `guardar_pdf` o moverá de vuelta.
+                # Por ahora, dejemos el campo archivo_pdf como está, o actualicemos a la nueva ruta en papelera?
+                # Si actualizamos a papelera, al restaurar hay que moverlo de vuelta.
+                
+                # Update path so download works from trash (admin only calls download?)
+                # "Puede restaurarlo desde la pestaña 'Eliminados'".
+                # Let's verify `restaurar_resultado` logic later. Ideally we just move it physically.
+                
+                # Let's save the new path in db so we know where it is
+                nuevo_rel_path = f"papelera/{nombre_carpeta}/{filename}"
+                resultado.archivo_pdf = nuevo_rel_path
+
+        db.session.commit()
+        flash(f'✅ Resultado movido a la papelera exitosamente.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al eliminar resultado: {str(e)}', 'danger')
+        print(f"Error eliminando resultado: {e}")
+        
+    return redirect(url_for('main.admin_resultados'))
+
+@main.route('/resultado/restaurar/<int:resultado_id>', methods=['POST'])
+@admin_required
+def restaurar_resultado(resultado_id):
+    """
+    Restaurar un resultado eliminado (sacarlo de la papelera)
+    - Mueve archivo de 'papelera/...' a 'pacientes/CI_Nombre/...'
+    - El resultado vuelve a ser consultable por el paciente
+    """
+    try:
+        resultado = Resultado.query.get_or_404(resultado_id)
+        
+        # Restaurar (quitar marca de eliminado)
+        resultado.eliminado = False
+        resultado.fecha_eliminacion = None
+        resultado.eliminado_por = None
+        
+        # Verificar si el archivo está en papelera y moverlo de vuelta
+        if resultado.archivo_pdf and 'papelera' in resultado.archivo_pdf:
+             path_papelera = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
+             
+             if os.path.exists(path_papelera):
+                 # Definir destino original (carpeta paciente)
+                 nombre_carpeta = secure_filename(f"{resultado.paciente_ci}_{resultado.paciente_nombre}")
+                 paciente_dir = os.path.join(UPLOAD_DIR, 'pacientes', nombre_carpeta)
+                 os.makedirs(paciente_dir, exist_ok=True)
+                 
+                 filename = os.path.basename(path_papelera)
+                 destino = os.path.join(paciente_dir, filename)
+                 
+                 import shutil
+                 shutil.move(path_papelera, destino)
+                 print(f"↺ Archivo restaurado: {destino}")
+                 
+                 # Actualizar ruta en BD
+                 nuevo_rel_path = f"pacientes/{nombre_carpeta}/{filename}"
+                 resultado.archivo_pdf = nuevo_rel_path
+        
+        db.session.commit()
+        flash(f'✅ Resultado restaurado exitosamente.', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error al restaurar resultado: {str(e)}")
+        flash(f'❌ Error al restaurar resultado: {str(e)}', 'danger')
+
+    return redirect(url_for('main.admin_resultados'))
+
+@main.route('/resultado/eliminar-permanente/<int:resultado_id>', methods=['POST'])
+@admin_required
+def eliminar_permanente(resultado_id):
+    """
+    ELIMINACIÓN PERMANENTE: Elimina el resultado completamente
+    - Elimina el registro de la base de datos
+    - Elimina el archivo PDF principal
+    - Elimina el archivo PDF de backup
+    - NO SE PUEDE DESHACER
     """
     try:
         resultado = Resultado.query.get_or_404(resultado_id)
@@ -1170,18 +1434,19 @@ def eliminar_resultado(resultado_id):
         db.session.commit()
 
         print("=" * 80)
-        print("✅ RESULTADO ELIMINADO EXITOSAMENTE")
+        print("⚠ RESULTADO ELIMINADO PERMANENTEMENTE")
         print(f"   Número Orden: {numero_orden}")
         print(f"   Paciente: {paciente_nombre}")
         print(f"   Archivos eliminados: {archivos_eliminados}")
+        print("   ❌ Esta acción NO SE PUEDE DESHACER")
         print("=" * 80)
 
-        flash(f'✅ Resultado de "{paciente_nombre}" (Orden: {numero_orden}) eliminado exitosamente', 'success')
+        flash(f'✅ Resultado de "{paciente_nombre}" eliminado permanentemente.', 'success')
 
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Error al eliminar resultado: {str(e)}")
-        flash(f'❌ Error al eliminar resultado: {str(e)}', 'danger')
+        print(f"❌ Error al eliminar permanentemente: {str(e)}")
+        flash(f'❌ Error al eliminar: {str(e)}', 'danger')
 
     return redirect(url_for('main.admin_resultados'))
 
@@ -1215,10 +1480,15 @@ def reemplazar_pdf(resultado_id):
                 os.remove(old_backup)
                 print(f"🗑 Backup anterior eliminado: {resultado.archivo_pdf}")
 
+        if not archivo_nuevo: # archivo_nuevo might be empty
+             pass 
+
         # Guardar nuevo PDF con backup
+        # Necesitamos el objeto paciente. Resultado tiene backref 'paciente'
         filename_nuevo, filepath_nuevo, backup_nuevo = guardar_pdf_con_backup(
             archivo_nuevo,
-            resultado.numero_orden
+            resultado.numero_orden,
+            resultado.paciente
         )
 
         if not filename_nuevo:
@@ -1246,12 +1516,242 @@ def reemplazar_pdf(resultado_id):
     return redirect(url_for('main.admin_resultados'))
 
 
+# ============================================
+# RUTAS DE REDES SOCIALES / PÁGINA PÚBLICA
+# ============================================
+
+# Carpeta para imágenes de publicaciones y galería
+SOCIAL_UPLOAD_DIR = os.path.join(UPLOAD_DIR, 'social')
+
+@main.route('/admin/redes-sociales')
+@admin_required
+def admin_redes_sociales():
+    """Panel de administración de Redes Sociales"""
+    publicaciones = Publicacion.query.order_by(Publicacion.orden.asc(), Publicacion.fecha_publicacion.desc()).all()
+    fotos = FotoGaleria.query.order_by(FotoGaleria.orden.asc(), FotoGaleria.fecha_subida.desc()).all()
+    
+    # Cargar configuración como diccionario
+    config_items = ConfiguracionLab.query.all()
+    configuracion = {item.clave: item.valor for item in config_items}
+    
+    return render_template('admin/redes_sociales.html',
+                         publicaciones=publicaciones,
+                         fotos=fotos,
+                         configuracion=configuracion)
+
+@main.route('/publicacion/nueva', methods=['POST'])
+@admin_required
+def nueva_publicacion():
+    """Crear nueva publicación"""
+    try:
+        titulo = request.form.get('titulo')
+        contenido = request.form.get('contenido')
+        icono = request.form.get('icono', 'fa-microscope')
+        categoria = request.form.get('categoria', 'General')
+        
+        nueva = Publicacion(
+            titulo=titulo,
+            contenido=contenido,
+            icono=icono,
+            categoria=categoria
+        )
+        
+        # Manejar imagen si se subió
+        if 'imagen' in request.files:
+            file = request.files['imagen']
+            if file and file.filename:
+                os.makedirs(SOCIAL_UPLOAD_DIR, exist_ok=True)
+                filename = f"pub_{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(file.filename)}"
+                filepath = os.path.join(SOCIAL_UPLOAD_DIR, filename)
+                file.save(filepath)
+                nueva.imagen = f"uploads/social/{filename}"
+        
+        db.session.add(nueva)
+        db.session.commit()
+        flash('✅ Publicación creada exitosamente', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al crear publicación: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
+
+@main.route('/publicacion/editar/<int:id>', methods=['POST'])
+@admin_required
+def editar_publicacion(id):
+    """Editar publicación existente"""
+    try:
+        pub = Publicacion.query.get_or_404(id)
+        pub.titulo = request.form.get('titulo', pub.titulo)
+        pub.contenido = request.form.get('contenido', pub.contenido)
+        pub.icono = request.form.get('icono', pub.icono)
+        pub.categoria = request.form.get('categoria', pub.categoria)
+        pub.activo = 'activo' in request.form
+        
+        # Manejar nueva imagen si se subió
+        if 'imagen' in request.files:
+            file = request.files['imagen']
+            if file and file.filename:
+                os.makedirs(SOCIAL_UPLOAD_DIR, exist_ok=True)
+                filename = f"pub_{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(file.filename)}"
+                filepath = os.path.join(SOCIAL_UPLOAD_DIR, filename)
+                file.save(filepath)
+                pub.imagen = f"uploads/social/{filename}"
+        
+        db.session.commit()
+        flash('✅ Publicación actualizada', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al editar: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
+
+@main.route('/publicacion/eliminar/<int:id>', methods=['POST'])
+@admin_required
+def eliminar_publicacion(id):
+    """Eliminar publicación"""
+    try:
+        pub = Publicacion.query.get_or_404(id)
+        db.session.delete(pub)
+        db.session.commit()
+        flash('✅ Publicación eliminada', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al eliminar: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
+
+@main.route('/foto/nueva', methods=['POST'])
+@admin_required
+def nueva_foto():
+    """Subir nueva foto a galería"""
+    try:
+        titulo = request.form.get('titulo')
+        descripcion = request.form.get('descripcion', '')
+        
+        if 'imagen' not in request.files:
+            flash('❌ Debe seleccionar una imagen', 'danger')
+            return redirect(url_for('main.admin_redes_sociales'))
+        
+        file = request.files['imagen']
+        if not file or not file.filename:
+            flash('❌ Archivo de imagen inválido', 'danger')
+            return redirect(url_for('main.admin_redes_sociales'))
+        
+        os.makedirs(SOCIAL_UPLOAD_DIR, exist_ok=True)
+        filename = f"foto_{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(file.filename)}"
+        filepath = os.path.join(SOCIAL_UPLOAD_DIR, filename)
+        file.save(filepath)
+        
+        nueva = FotoGaleria(
+            titulo=titulo,
+            descripcion=descripcion,
+            imagen=f"uploads/social/{filename}"
+        )
+        
+        db.session.add(nueva)
+        db.session.commit()
+        flash('✅ Foto agregada a la galería', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al subir foto: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
+
+@main.route('/foto/eliminar/<int:id>', methods=['POST'])
+@admin_required
+def eliminar_foto(id):
+    """Eliminar foto de galería"""
+    try:
+        foto = FotoGaleria.query.get_or_404(id)
+        db.session.delete(foto)
+        db.session.commit()
+        flash('✅ Foto eliminada', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al eliminar: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
+
+@main.route('/configuracion/guardar', methods=['POST'])
+@admin_required
+def guardar_configuracion():
+    """Guardar configuración del laboratorio"""
+    try:
+        # Lista de claves de configuración
+        claves = ['telefono', 'whatsapp', 'email', 'direccion', 'referencia',
+                  'horario_semana', 'horario_sabado', 'horario_domingo',
+                  'experiencia', 'certificacion', 'rating', 'resenas']
+        
+        for clave in claves:
+            valor = request.form.get(clave, '')
+            if valor:
+                config = ConfiguracionLab.query.filter_by(clave=clave).first()
+                if config:
+                    config.valor = valor
+                else:
+                    config = ConfiguracionLab(clave=clave, valor=valor)
+                    db.session.add(config)
+        
+        db.session.commit()
+        flash('✅ Configuración guardada exitosamente', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al guardar: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
 
 
-
-
-
-
+@main.route('/imagenes-perfil/guardar', methods=['POST'])
+@admin_required
+def guardar_imagenes_perfil():
+    """Guardar imágenes de portada y perfil"""
+    try:
+        os.makedirs(SOCIAL_UPLOAD_DIR, exist_ok=True)
+        
+        # Foto de Portada
+        if 'foto_portada' in request.files:
+            file = request.files['foto_portada']
+            if file and file.filename:
+                filename = f"portada_{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(file.filename)}"
+                filepath = os.path.join(SOCIAL_UPLOAD_DIR, filename)
+                file.save(filepath)
+                
+                # Guardar en configuración
+                config = ConfiguracionLab.query.filter_by(clave='foto_portada').first()
+                if config:
+                    config.valor = f"uploads/social/{filename}"
+                else:
+                    config = ConfiguracionLab(clave='foto_portada', valor=f"uploads/social/{filename}")
+                    db.session.add(config)
+        
+        # Foto de Perfil/Logo
+        if 'foto_perfil' in request.files:
+            file = request.files['foto_perfil']
+            if file and file.filename:
+                filename = f"perfil_{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(file.filename)}"
+                filepath = os.path.join(SOCIAL_UPLOAD_DIR, filename)
+                file.save(filepath)
+                
+                # Guardar en configuración
+                config = ConfiguracionLab.query.filter_by(clave='foto_perfil').first()
+                if config:
+                    config.valor = f"uploads/social/{filename}"
+                else:
+                    config = ConfiguracionLab(clave='foto_perfil', valor=f"uploads/social/{filename}")
+                    db.session.add(config)
+        
+        db.session.commit()
+        flash('✅ Imágenes actualizadas exitosamente', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al guardar imágenes: {str(e)}', 'danger')
+    
+    return redirect(url_for('main.admin_redes_sociales'))
 
 
 

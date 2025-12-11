@@ -1,0 +1,591 @@
+{% extends "base.html" %}
+{% block title %}Nuestros Servicios - Laboratorio Pérez{% endblock %}
+{% block content %}
+<style>
+    :root {
+        --fb-green: #1ABC9C;
+        --fb-orange: #F39C12;
+        --fb-dark: #1c1e21;
+        --fb-gray: #65676b;
+        --fb-light: #f0f2f5;
+        --fb-card: #ffffff;
+        --fb-border: #dadde1;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: var(--fb-light);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* COVER - ESTILO FACEBOOK */
+    .fb-cover {
+        width: 100%;
+        height: 420px;
+        position: relative;
+        overflow: hidden;
+        background: #f0f2f5;
+    }
+
+    .fb-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 20%;
+    }
+
+    /* Ajuste para pantallas grandes - mostrar más de la imagen */
+    @media (min-width: 1200px) {
+        .fb-cover {
+            height: 450px;
+        }
+
+        .fb-cover img {
+            object-position: center 18%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .fb-cover {
+            height: 350px;
+        }
+
+        .fb-cover img {
+            object-position: center 25%;
+        }
+    }
+
+    .fb-cover::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to top, var(--fb-card) 0%, transparent 100%);
+    }
+
+    /* HEADER */
+    .fb-header {
+        background: var(--fb-card);
+        border-bottom: 1px solid var(--fb-border);
+    }
+
+    .fb-header-content {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 25px;
+        margin-top: -80px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .fb-profile-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--fb-border);
+    }
+
+    .fb-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        border: 5px solid var(--fb-card);
+        overflow: hidden;
+        background: var(--fb-card);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        flex-shrink: 0;
+    }
+
+    .fb-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .fb-info {
+        flex: 1;
+        padding-bottom: 10px;
+    }
+
+    .fb-name {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--fb-dark);
+        margin-bottom: 8px;
+    }
+
+    .fb-name span {
+        color: var(--fb-green);
+    }
+
+    .fb-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        color: var(--fb-gray);
+        font-size: 0.95rem;
+    }
+
+    .fb-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .fb-meta-item i {
+        color: var(--fb-green);
+    }
+
+    /* NAVIGATION */
+    .fb-nav {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 25px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .fb-tab {
+        padding: 16px 18px;
+        color: var(--fb-gray);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .fb-tab:hover {
+        background: var(--fb-light);
+        color: var(--fb-green);
+    }
+
+    .fb-tab.active {
+        color: var(--fb-green);
+        border-bottom-color: var(--fb-green);
+    }
+
+    /* MAIN CONTENT */
+    .fb-main {
+        max-width: 700px;
+        margin: 25px auto;
+        padding: 0 20px 60px;
+    }
+
+    /* POST CARD */
+    .fb-post {
+        background: var(--fb-card);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .fb-post-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .fb-post-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .fb-post-author {
+        font-weight: 700;
+        color: var(--fb-dark);
+    }
+
+    .fb-post-time {
+        font-size: 0.85rem;
+        color: var(--fb-gray);
+    }
+
+    .fb-post-body {
+        padding: 0 15px 15px;
+    }
+
+    .fb-post-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--fb-green);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .fb-post-text {
+        color: var(--fb-dark);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .fb-post-image {
+        width: 100%;
+        max-height: 450px;
+        object-fit: cover;
+    }
+
+    .fb-post-share {
+        padding: 12px 15px;
+        border-top: 1px solid var(--fb-border);
+        display: flex;
+        gap: 10px;
+    }
+
+    .share-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        color: white;
+        transition: all 0.2s ease;
+    }
+
+    .share-btn:hover {
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .share-whatsapp {
+        background: #25D366;
+    }
+
+    .share-whatsapp:hover {
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+    }
+
+    .share-facebook {
+        background: #1877f2;
+    }
+
+    .share-facebook:hover {
+        box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .fb-cover {
+            height: 350px;
+        }
+
+        .fb-header-content {
+            margin-top: -60px;
+        }
+
+        .fb-profile-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .fb-avatar {
+            width: 130px;
+            height: 130px;
+        }
+
+        .fb-name {
+            font-size: 1.7rem;
+        }
+
+        .fb-meta {
+            justify-content: center;
+        }
+
+        .fb-nav {
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        .fb-tab {
+            padding: 14px 12px;
+            font-size: 0.9rem;
+        }
+
+        .fb-post-share {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .fb-cover {
+            height: 300px;
+        }
+
+        .fb-avatar {
+            width: 100px;
+            height: 100px;
+        }
+
+        .fb-name {
+            font-size: 1.4rem;
+        }
+
+        .fb-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }
+</style>
+
+<!-- COVER IMAGE - CERRO CON PUNTA VISIBLE - CLICK PARA VER COMPLETA -->
+<div class="fb-cover" onclick="openCoverModal()" style="cursor: pointer;" title="Clic para ver imagen completa">
+    <img src="{{ url_for('static', filename=config.get('foto_portada', 'img/cerro_potosi.jpg')) }}"
+        alt="Cerro Rico de Potosí" id="coverImage">
+</div>
+
+<!-- HEADER -->
+<div class="fb-header">
+    <div class="fb-header-content">
+        <div class="fb-profile-row">
+            <div class="fb-avatar">
+                <img src="{{ url_for('static', filename=config.get('foto_perfil', 'img/logo.jpg')) }}"
+                    alt="Laboratorio Pérez">
+            </div>
+            <div class="fb-info">
+                <h1 class="fb-name">Laboratorio Clínico <span>Pérez</span></h1>
+                <div class="fb-meta">
+                    <span class="fb-meta-item"><i class="fas fa-microscope"></i> Laboratorio Clínico</span>
+                    <span class="fb-meta-item"><i class="fas fa-map-marker-alt"></i> Potosí, Bolivia</span>
+                    <span class="fb-meta-item"><i class="fas fa-star"></i> 4.9 ★ (120+ reseñas)</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="fb-nav">
+            <a href="{{ url_for('main.servicios') }}" class="fb-tab active">
+                <i class="fas fa-stream"></i> Publicaciones
+            </a>
+            <a href="{{ url_for('main.servicios_info') }}" class="fb-tab">
+                <i class="fas fa-info-circle"></i> Información
+            </a>
+            <a href="{{ url_for('main.servicios_fotos') }}" class="fb-tab">
+                <i class="fas fa-images"></i> Fotos
+            </a>
+        </nav>
+    </div>
+</div>
+
+<!-- POSTS -->
+<div class="fb-main">
+
+    {% if publicaciones %}
+    <!-- Publicaciones dinámicas desde la base de datos -->
+    {% for pub in publicaciones %}
+    <article class="fb-post">
+        <div class="fb-post-header">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Avatar" class="fb-post-avatar">
+            <div>
+                <div class="fb-post-author">Laboratorio Clínico Pérez</div>
+                <div class="fb-post-time">{{ pub.fecha_publicacion.strftime('%d/%m/%Y') if pub.fecha_publicacion else
+                    'Publicado recientemente' }}</div>
+            </div>
+        </div>
+        <div class="fb-post-body">
+            <div class="fb-post-title"><i class="fas {{ pub.icono }}"></i> {{ pub.titulo }}</div>
+            <p class="fb-post-text">{{ pub.contenido }}</p>
+        </div>
+        {% if pub.imagen %}
+        <img src="{{ url_for('static', filename=pub.imagen) }}" alt="{{ pub.titulo }}" class="fb-post-image">
+        {% endif %}
+        <div class="fb-post-share">
+            <a href="https://wa.me/?text={{ pub.titulo|urlencode }}%20-%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-whatsapp">
+                <i class="fab fa-whatsapp"></i> Compartir
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-facebook">
+                <i class="fab fa-facebook-f"></i> Compartir
+            </a>
+        </div>
+    </article>
+    {% endfor %}
+    {% else %}
+    <!-- Publicaciones estáticas por defecto si no hay en BD -->
+    <article class="fb-post">
+        <div class="fb-post-header">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Avatar" class="fb-post-avatar">
+            <div>
+                <div class="fb-post-author">Laboratorio Clínico Pérez</div>
+                <div class="fb-post-time">Publicado recientemente</div>
+            </div>
+        </div>
+        <div class="fb-post-body">
+            <div class="fb-post-title"><i class="fas fa-microscope"></i> Análisis Especializados</div>
+            <p class="fb-post-text">Contamos con tecnología de última generación para brindarte los resultados más
+                precisos y confiables. Nuestro equipo está capacitado para realizar una amplia gama de análisis
+                clínicos.</p>
+        </div>
+        <img src="{{ url_for('static', filename='img/analisis_especializados.jpg') }}" alt="Análisis"
+            class="fb-post-image">
+        <div class="fb-post-share">
+            <a href="https://wa.me/?text=Laboratorio%20Pérez%20Potosí%20-%20Análisis%20Especializados%20https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-whatsapp">
+                <i class="fab fa-whatsapp"></i> Compartir
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-facebook">
+                <i class="fab fa-facebook-f"></i> Compartir
+            </a>
+        </div>
+    </article>
+
+    <article class="fb-post">
+        <div class="fb-post-header">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Avatar" class="fb-post-avatar">
+            <div>
+                <div class="fb-post-author">Laboratorio Clínico Pérez</div>
+                <div class="fb-post-time">Hace 2 días</div>
+            </div>
+        </div>
+        <div class="fb-post-body">
+            <div class="fb-post-title"><i class="fas fa-dna"></i> Pruebas de ADN y Paternidad</div>
+            <p class="fb-post-text">Realizamos pruebas con la máxima confidencialidad y precisión. Resultados confiables
+                para pruebas de paternidad y estudios genéticos. ✅ Resultados en tiempo récord ✅ 100% Confidencial</p>
+        </div>
+        <img src="{{ url_for('static', filename='img/pruebas_adn.jpg') }}" alt="ADN" class="fb-post-image">
+        <div class="fb-post-share">
+            <a href="https://wa.me/?text=Pruebas%20de%20ADN%20en%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-whatsapp">
+                <i class="fab fa-whatsapp"></i> Compartir
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-facebook">
+                <i class="fab fa-facebook-f"></i> Compartir
+            </a>
+        </div>
+    </article>
+
+    <article class="fb-post">
+        <div class="fb-post-header">
+            <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Avatar" class="fb-post-avatar">
+            <div>
+                <div class="fb-post-author">Laboratorio Clínico Pérez</div>
+                <div class="fb-post-time">Hace 3 días</div>
+            </div>
+        </div>
+        <div class="fb-post-body">
+            <div class="fb-post-title"><i class="fas fa-baby"></i> Pruebas de Embarazo</div>
+            <p class="fb-post-text">Detección temprana y precisa de embarazo. Contamos con pruebas de alta sensibilidad
+                para brindarte resultados confiables. 💚 Tu salud y la de tu bebé es nuestra prioridad</p>
+        </div>
+        <img src="{{ url_for('static', filename='img/pruebas_embarazo.jpg') }}" alt="Embarazo" class="fb-post-image">
+        <div class="fb-post-share">
+            <a href="https://wa.me/?text=Pruebas%20de%20Embarazo%20en%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-whatsapp">
+                <i class="fab fa-whatsapp"></i> Compartir
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
+                target="_blank" class="share-btn share-facebook">
+                <i class="fab fa-facebook-f"></i> Compartir
+            </a>
+        </div>
+    </article>
+    {% endif %}
+
+</div>
+
+<!-- Modal para ver foto de portada completa -->
+<div id="coverModal" class="cover-modal" ondblclick="closeCoverModal()">
+    <div class="cover-modal-content" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()">
+        <button class="cover-modal-close" onclick="closeCoverModal()"><i class="fas fa-times"></i></button>
+        <img id="coverModalImg" src="" alt="Foto de Portada">
+    </div>
+    <div
+        style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.5); font-size: 0.85rem;">
+        <i class="fas fa-mouse-pointer"></i> Doble clic para cerrar &nbsp;|&nbsp; ESC para salir
+    </div>
+</div>
+
+<style>
+    .cover-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cover-modal.active {
+        display: flex;
+    }
+
+    .cover-modal-content {
+        position: relative;
+        max-width: 95%;
+        max-height: 90vh;
+    }
+
+    .cover-modal-content img {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 10px;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .cover-modal-close {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .cover-modal-close:hover {
+        transform: scale(1.2);
+        color: #F39C12;
+    }
+</style>
+
+<script>
+    function openCoverModal() {
+        const coverImg = document.getElementById('coverImage');
+        document.getElementById('coverModalImg').src = coverImg.src;
+        document.getElementById('coverModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCoverModal() {
+        document.getElementById('coverModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+        if (document.getElementById('coverModal').classList.contains('active')) {
+            if (e.key === 'Escape') closeCoverModal();
+        }
+    });
+</script>
+
+{% endblock %}

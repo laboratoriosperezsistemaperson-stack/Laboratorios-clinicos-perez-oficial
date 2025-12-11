@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +10,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/laboratorio_perez.css') }}">
     <style>
         :root {
-            --verde-admin: #1ABC9C;
-            --verde-oscuro: #16A085;
-            --azul-admin: #3498DB;
-            --naranja: #F39C12;
+            --admin-dark: #1a1d29;
+            --admin-darker: #12141d;
+            --admin-accent: #F39C12;
+            --admin-accent-light: #f5b041;
+            --admin-success: #1ABC9C;
+            --admin-danger: #ef4444;
         }
 
         * {
@@ -23,65 +26,216 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            background: linear-gradient(135deg, #1a1d29 0%, #2d1f4e 100%);
             min-height: 100vh;
             padding: 0;
             margin: 0;
         }
 
-        /* ========== NAVBAR BRUTAL VERDE ADMIN ========== */
+        /* ========== NAVBAR ADMIN PROFESIONAL OSCURO ========== */
+        @keyframes slideInAdmin {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulseGlowAdmin {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 25px 8px rgba(243, 156, 18, 0.3);
+            }
+        }
+
+        @keyframes glowPulseAdmin {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 30px rgba(243, 156, 18, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 4px 50px rgba(243, 156, 18, 0.5);
+            }
+        }
+
+        @keyframes badgePulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
         .navbar-brutal-admin {
-            background: linear-gradient(135deg, var(--verde-admin), var(--verde-oscuro));
-            backdrop-filter: blur(20px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
-            padding: 12px 0;
+            background: linear-gradient(135deg,
+                    rgba(243, 156, 18, 0.95) 0%,
+                    rgba(230, 126, 34, 0.95) 50%,
+                    rgba(211, 84, 0, 0.95) 100%);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow:
+                0 4px 30px rgba(243, 156, 18, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0;
             position: sticky;
             top: 0;
             z-index: 1000;
+            animation: slideInAdmin 0.6s ease-out, glowPulseAdmin 4s ease-in-out infinite;
+        }
+
+        .navbar-brutal-admin::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.6) 50%,
+                    transparent 100%);
+            opacity: 0.6;
         }
 
         .navbar-brutal-admin .logo-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 14px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .navbar-brutal-admin .logo-img {
-            height: 45px;
-            width: 45px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s ease;
+        .navbar-brutal-admin .logo-container:hover {
+            transform: translateY(-2px) scale(1.02);
         }
 
-        .navbar-brutal-admin .logo-img:hover {
-            transform: scale(1.1) rotate(5deg);
+        .logo-circle-admin {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                0 0 0 2px rgba(139, 92, 246, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .navbar-brutal-admin .brand-text {
+        .navbar-brutal-admin .logo-container:hover .logo-circle-admin {
+            border-radius: 50%;
+            box-shadow:
+                0 8px 30px rgba(139, 92, 246, 0.3),
+                0 0 0 3px rgba(139, 92, 246, 0.5);
+            animation: pulseGlowAdmin 2s ease-in-out infinite;
+        }
+
+        .logo-img-admin {
+            width: 85%;
+            height: 85%;
+            object-fit: cover;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .navbar-brutal-admin .logo-container:hover .logo-img-admin {
+            border-radius: 50%;
+            transform: scale(1.05);
+        }
+
+        .logo-text-admin {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .brand-text {
             font-size: 1.4rem;
-            font-weight: 900;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #ffe4b5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle-admin {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--admin-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 3px;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #d35400, #c0392b);
             color: white;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            animation: badgePulse 2s ease-in-out infinite;
+            box-shadow: 0 3px 12px rgba(211, 84, 0, 0.4);
         }
 
         .nav-links-admin {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .nav-link-brutal-admin {
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 25px;
             text-decoration: none;
-            color: white;
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link-brutal-admin i {
+            font-size: 1rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
         }
 
         .nav-link-brutal-admin:hover {
@@ -90,25 +244,38 @@
             transform: translateY(-2px);
         }
 
+        .nav-link-brutal-admin:hover i {
+            opacity: 1;
+            color: #fff3cd;
+            transform: scale(1.15) rotate(5deg);
+        }
+
         .nav-link-brutal-admin.active {
             background: rgba(255, 255, 255, 0.3);
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 4px 15px rgba(211, 84, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-link-brutal-admin.active i {
+            color: #fff3cd;
         }
 
         .btn-logout-brutal {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
             color: white !important;
-            padding: 10px 20px !important;
+            padding: 10px 18px !important;
             border-radius: 25px;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
             border: none;
             font-weight: 700;
+            margin-left: 8px;
         }
 
         .btn-logout-brutal:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
             color: white !important;
         }
 
@@ -118,13 +285,22 @@
             flex-direction: column;
             gap: 5px;
             cursor: pointer;
-            padding: 10px;
+            padding: 12px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-admin:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: scale(1.05);
         }
 
         .hamburger-admin span {
-            width: 30px;
-            height: 3px;
-            background: white;
+            width: 24px;
+            height: 2px;
+            background: var(--admin-accent-light);
             border-radius: 10px;
             transition: all 0.3s ease;
         }
@@ -132,16 +308,22 @@
         @media (max-width: 992px) {
             .nav-links-admin {
                 position: fixed;
-                top: 69px;
+                top: 70px;
                 left: -100%;
                 width: 100%;
-                background: linear-gradient(135deg, var(--verde-admin), var(--verde-oscuro));
+                background: linear-gradient(135deg,
+                        rgba(243, 156, 18, 0.98) 0%,
+                        rgba(230, 126, 34, 0.98) 100%);
+                backdrop-filter: blur(20px);
                 flex-direction: column;
                 padding: 20px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                border-radius: 0;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
                 transition: left 0.3s ease;
-                max-height: calc(100vh - 69px);
+                max-height: calc(100vh - 70px);
                 overflow-y: auto;
+                border: none;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.2);
             }
 
             .nav-links-admin.active {
@@ -155,24 +337,30 @@
             .nav-link-brutal-admin {
                 width: 100%;
                 justify-content: center;
-                padding: 15px;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                margin-bottom: 6px;
             }
 
             .btn-logout-brutal {
                 width: 100%;
                 justify-content: center;
+                margin-left: 0;
+                margin-top: 10px;
             }
         }
 
         /* ========== CONTENIDO ADMIN ========== */
         .admin-wrapper {
             padding: 0;
-            min-height: calc(100vh - 69px);
+            min-height: calc(100vh - 70px);
         }
 
         .admin-content {
-            background: white;
-            min-height: calc(100vh - 69px);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            min-height: calc(100vh - 70px);
+            border-radius: 0;
         }
 
         /* Mensajes flash */
@@ -180,19 +368,26 @@
             padding: 20px 30px 0 30px;
         }
 
-        /* Estilos para que el contenido respire */
-        {% block extra_styles %}{% endblock %}
+        /* Estilos adicionales de paginas */
     </style>
+    {% block extra_styles %}{% endblock %}
 </head>
+
 <body>
 
-    <!-- NAVBAR BRUTAL ADMIN -->
+    <!-- NAVBAR MODERNO ADMIN -->
     <nav class="navbar-brutal-admin">
-        <div class="container-fluid" style="padding: 0 30px;">
+        <div class="container-fluid" style="padding: 12px 30px; position: relative; z-index: 1;">
             <div class="d-flex justify-content-between align-items-center w-100">
                 <a href="{{ url_for('main.dashboard') }}" class="logo-container text-decoration-none">
-                    <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo-img">
-                    <span class="brand-text">Lab Pérez - Admin</span>
+                    <div class="logo-circle-admin">
+                        <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo-img-admin">
+                    </div>
+                    <div class="logo-text-admin">
+                        <span class="brand-text">Lab Pérez</span>
+                        <span class="brand-subtitle-admin"><span class="admin-badge">ADMIN</span> <span
+                                style="color: white; font-weight: 600;">PANEL</span></span>
+                    </div>
                 </a>
 
                 <div class="hamburger-admin" onclick="toggleMenuAdmin()">
@@ -203,20 +398,24 @@
 
                 <div class="nav-links-admin" id="navLinksAdmin">
                     <a href="{{ url_for('main.dashboard') }}"
-                       class="nav-link-brutal-admin {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                        class="nav-link-brutal-admin {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i> Dashboard
                     </a>
                     <a href="{{ url_for('main.admin_pacientes') }}"
-                       class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_pacientes' %}active{% endif %}">
+                        class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_pacientes' %}active{% endif %}">
                         <i class="fas fa-users"></i> Pacientes
                     </a>
                     <a href="{{ url_for('main.admin_resultados') }}"
-                       class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_resultados' %}active{% endif %}">
+                        class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_resultados' %}active{% endif %}">
                         <i class="fas fa-clipboard-list"></i> Resultados
                     </a>
                     <a href="{{ url_for('main.admin_pruebas') }}"
-                       class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_pruebas' %}active{% endif %}">
+                        class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_pruebas' %}active{% endif %}">
                         <i class="fas fa-vial"></i> Pruebas
+                    </a>
+                    <a href="{{ url_for('main.admin_redes_sociales') }}"
+                        class="nav-link-brutal-admin {% if request.endpoint == 'main.admin_redes_sociales' %}active{% endif %}">
+                        <i class="fas fa-share-alt"></i> Redes Sociales
                     </a>
                     <a href="{{ url_for('auth.logout') }}" class="nav-link-brutal-admin btn-logout-brutal">
                         <i class="fas fa-sign-out-alt"></i> Salir
@@ -231,16 +430,16 @@
         <div class="admin-content">
             <!-- Mensajes Flash -->
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="flash-messages">
-                        {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% endwith %}
 
             <!-- Contenido específico de cada página -->
@@ -274,4 +473,5 @@
 
     {% block extra_scripts %}{% endblock %}
 </body>
+
 </html>

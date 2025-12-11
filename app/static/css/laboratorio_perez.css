@@ -44,22 +44,507 @@ body {
 }
 
 /* ============================================
-   NAVBAR SUPERIOR
+   NAVBAR MODERNO GLASSMORPHISM - PÚBLICO
    ============================================ */
 @keyframes navSlideDown {
     from {
         opacity: 0;
         transform: translateY(-100%);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-6px) rotate(2deg);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(26, 188, 156, 0.4),
+            0 8px 32px rgba(0, 0, 0, 0.12);
+    }
+
+    50% {
+        box-shadow:
+            0 0 25px 8px rgba(26, 188, 156, 0.3),
+            0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 30px rgba(26, 188, 156, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 4px 50px rgba(26, 188, 156, 0.5);
+    }
+}
+
+@keyframes underlineSlide {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+.navbar-apple {
+    background: linear-gradient(135deg,
+            rgba(26, 188, 156, 0.95) 0%,
+            rgba(22, 160, 133, 0.95) 50%,
+            rgba(19, 141, 117, 0.95) 100%);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    box-shadow:
+        0 4px 30px rgba(26, 188, 156, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    animation: navSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1), glowPulse 4s ease-in-out infinite;
+    margin: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-apple::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.5) 50%,
+            transparent);
+}
+
+.navbar-apple-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo Moderno con Glassmorphism */
+.navbar-apple-logo {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-apple-logo:hover {
+    transform: translateY(-3px) scale(1.02);
+}
+
+.logo-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.15),
+        0 0 0 2px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    animation: logoFloat 4s ease-in-out infinite;
+}
+
+.logo-circle::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 40%,
+            rgba(255, 255, 255, 0.8) 50%,
+            transparent 60%);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.navbar-apple-logo:hover .logo-circle {
+    border-radius: 50%;
+    transform: scale(1.1) rotate(5deg);
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.logo-circle-img {
+    width: 85%;
+    height: 85%;
+    object-fit: cover;
+    border-radius: 12px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-apple-logo:hover .logo-circle-img {
+    border-radius: 50%;
+    transform: scale(1.05);
+}
+
+.logo-text-apple {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.logo-name-apple {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-subtitle-apple {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-top: 2px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.7),
+            rgba(255, 255, 255, 1),
+            rgba(255, 255, 255, 0.7));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Menú Desktop Moderno */
+.navbar-apple-menu {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.nav-link-apple {
+    color: white !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 10px 18px;
+    border-radius: 25px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    white-space: nowrap;
+    background: transparent;
+    overflow: hidden;
+}
+
+.nav-link-apple::before {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.nav-link-apple i {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+.nav-link-apple span {
+    transition: all 0.3s ease;
+}
+
+.nav-link-apple:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+.nav-link-apple:hover::before {
+    width: 60%;
+}
+
+.nav-link-apple:hover i {
+    opacity: 1;
+    transform: scale(1.15) rotate(5deg);
+}
+
+.nav-link-apple.active {
+    background: rgba(255, 255, 255, 0.3);
+    color: white !important;
+    font-weight: 700;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav-link-apple.active::before {
+    width: 70%;
+    height: 3px;
+}
+
+/* Botón CTA Premium */
+.nav-cta-apple {
+    background: linear-gradient(135deg, #F39C12, #E67E22) !important;
+    backdrop-filter: blur(10px);
+    border: none !important;
+    color: white !important;
+    font-weight: 700;
+    padding: 12px 22px !important;
+    margin-left: 8px;
+    box-shadow:
+        0 4px 15px rgba(243, 156, 18, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.nav-cta-apple:hover {
+    background: linear-gradient(135deg, #E67E22, #D35400) !important;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow:
+        0 8px 25px rgba(243, 156, 18, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav-cta-apple::before {
+    display: none;
+}
+
+/* Botón Hamburger Premium */
+.navbar-apple-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-apple-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-apple-toggle span {
+    width: 22px;
+    height: 2px;
+    background: white;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-apple-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar-apple-toggle.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.navbar-apple-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Menú Móvil Moderno */
+.navbar-apple-mobile {
+    display: none;
+    flex-direction: column;
+    background: linear-gradient(180deg,
+            rgba(26, 188, 156, 0.98) 0%,
+            rgba(22, 160, 133, 0.98) 50%,
+            rgba(19, 141, 117, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    padding: 20px 30px 30px;
+    gap: 6px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+    animation: slideDownApple 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* Fixed position to show full menu regardless of scroll */
+    position: fixed;
+    top: 75px;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+@keyframes slideDownApple {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar-apple-mobile.active {
+    display: flex;
+}
+
+.navbar-apple-mobile .nav-link-apple {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 4px;
+}
+
+.navbar-apple-mobile .nav-link-apple:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar-apple-mobile .nav-link-apple::before {
+    display: none;
+}
+
+.navbar-apple-mobile .nav-cta-apple {
+    margin-left: 0;
+    margin-top: 8px;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .navbar-apple-menu {
+        display: none;
+    }
+
+    .navbar-apple-toggle {
+        display: flex;
+    }
+
+    .navbar-apple-container {
+        padding: 12px 24px;
+    }
+
+    .logo-circle {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+    }
+
+    .logo-name-apple {
+        font-size: 1.4rem;
+    }
+
+    .logo-subtitle-apple {
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-apple-container {
+        padding: 10px 16px;
+    }
+
+    .logo-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+    }
+
+    .logo-name-apple {
+        font-size: 1.2rem;
+    }
+
+    .logo-subtitle-apple {
+        font-size: 0.55rem;
+        letter-spacing: 1.5px;
+    }
+
+    .navbar-apple-logo {
+        gap: 10px;
+    }
+
+    .navbar-apple-mobile {
+        padding: 16px 20px;
+    }
+
+    .navbar-apple-mobile .nav-link-apple {
+        padding: 14px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Mantener compatibilidad con navbar-custom antiguo */
 .navbar-custom {
     background: linear-gradient(135deg, var(--color-verde), var(--color-verde-oscuro));
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     padding: 0.4rem 0;
     backdrop-filter: blur(10px);
     position: sticky;
@@ -69,117 +554,28 @@ body {
     margin: 0;
 }
 
-.navbar-custom::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: shimmer 3s infinite;
-    pointer-events: none; /* Permite que los clics pasen a través del pseudo-elemento */
-}
-
-.navbar-custom .navbar-brand {
-    color: white !important;
-    font-weight: bold;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-}
-
-.navbar-custom .navbar-brand:hover {
-    transform: scale(1.05);
-    filter: drop-shadow(0 5px 15px rgba(255,255,255,0.3));
-}
-
-.navbar-custom .navbar-brand img {
-    transition: all 0.3s ease;
-}
-
-.navbar-custom .navbar-brand:hover img {
-    transform: rotate(360deg);
-}
-
-.navbar-custom .nav-link {
-    color: rgba(255,255,255,0.9) !important;
-    font-weight: 500;
-    margin: 0 8px;
-    padding: 6px 14px !important;
-    border-radius: 25px;
-    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    position: relative;
-    overflow: hidden;
-}
-
-.navbar-custom .nav-link::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: white;
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
-
-.navbar-custom .nav-link:hover::before,
-.navbar-custom .nav-link.active::before {
-    width: 80%;
-}
-
-.navbar-custom .nav-link:hover,
-.navbar-custom .nav-link.active {
-    background: rgba(255,255,255,0.2);
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.navbar-custom .btn-logout {
-    background: var(--color-naranja);
-    color: white;
-    border: none;
-    padding: 6px 16px;
-    border-radius: 25px;
-    font-weight: 500;
-    transition: all 0.4s ease;
-    box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
-}
-
-.navbar-custom .btn-logout:hover {
-    background: var(--color-naranja-oscuro);
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(243, 156, 18, 0.5);
-}
-
 /* ============================================
    BOTÓN HAMBURGUESA MÓVIL
    ============================================ */
 .navbar-toggler {
-    border: 2px solid rgba(255,255,255,0.8) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
     padding: 8px 12px !important;
     position: relative;
-    z-index: 1001; /* Asegura que esté por encima del pseudo-elemento */
-    background: rgba(255,255,255,0.1) !important;
+    z-index: 1001;
+    /* Asegura que esté por encima del pseudo-elemento */
+    background: rgba(255, 255, 255, 0.1) !important;
     border-radius: 8px !important;
     transition: all 0.3s ease;
 }
 
 .navbar-toggler:hover {
-    background: rgba(255,255,255,0.2) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
     border-color: white !important;
     transform: scale(1.05);
 }
 
 .navbar-toggler:focus {
-    box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.25) !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
     outline: none;
 }
 
@@ -202,7 +598,7 @@ body {
         margin-top: 15px;
         padding: 20px;
         border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     .navbar-custom .nav-link {
@@ -226,7 +622,7 @@ body {
     font-size: 3.5rem;
     font-weight: bold;
     margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .hero-section p {
@@ -241,30 +637,50 @@ body {
     padding: 15px 40px;
     font-size: 1.2rem;
     border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
 
 .hero-section .btn-hero:hover {
     background: var(--color-naranja-oscuro);
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes serviceFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 @keyframes iconSpin {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.1); }
-    100% { transform: rotate(360deg) scale(1); }
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(180deg) scale(1.1);
+    }
+
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
 }
 
 @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
 }
 
 .services-section {
@@ -277,7 +693,7 @@ body {
     border-radius: 20px;
     padding: 40px 30px;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     height: 100%;
     position: relative;
@@ -382,13 +798,13 @@ body {
 .card {
     border: none;
     border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     overflow: hidden;
 }
 
 .card:hover {
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     transform: translateY(-5px);
 }
 
@@ -407,13 +823,13 @@ body {
     padding: 25px;
     color: white;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .stat-card i {
@@ -522,14 +938,16 @@ body {
 /* ============================================
    FORMULARIOS
    ============================================ */
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: 10px;
     border: 2px solid #e0e0e0;
     padding: 12px;
     transition: all 0.3s ease;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: var(--color-verde);
     box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.25);
 }
@@ -554,7 +972,7 @@ body {
 .login-card {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     overflow: hidden;
     width: 100%;
     max-width: 450px;
@@ -596,11 +1014,11 @@ body {
     .hero-section h1 {
         font-size: 2.5rem;
     }
-    
+
     .service-card {
         margin-bottom: 20px;
     }
-    
+
     .contact-info {
         flex-direction: column;
         gap: 20px;

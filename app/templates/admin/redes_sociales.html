@@ -1,0 +1,660 @@
+{% extends "base_admin.html" %}
+{% block title %}Redes Sociales - Admin{% endblock %}
+{% block extra_styles %}
+<style>
+    .content-wrapper {
+        padding: 30px;
+    }
+
+    .social-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        background: white;
+        padding: 10px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .social-tab {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+
+    .social-tab:hover {
+        background: #e9ecef;
+    }
+
+    .social-tab.active {
+        background: linear-gradient(135deg, #F39C12, #E67E22);
+        color: white;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .social-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .social-card-header {
+        background: linear-gradient(135deg, #F39C12, #E67E22);
+        color: white;
+        padding: 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .social-card-body {
+        padding: 20px;
+    }
+
+    .pub-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        align-items: center;
+    }
+
+    .pub-item:last-child {
+        border-bottom: none;
+    }
+
+    .pub-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .pub-info {
+        flex: 1;
+    }
+
+    .pub-title {
+        font-weight: 700;
+        color: #2C3E50;
+        margin-bottom: 5px;
+    }
+
+    .pub-text {
+        color: #7F8C8D;
+        font-size: 0.9rem;
+    }
+
+    .foto-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    .foto-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        aspect-ratio: 1;
+    }
+
+    .foto-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .foto-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+        color: white;
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .btn-add-new {
+        background: linear-gradient(135deg, #F39C12, #E67E22);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-add-new:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+    }
+
+    .config-form label {
+        font-weight: 600;
+        color: #2C3E50;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .config-form input,
+    .config-form textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+
+    .config-form input:focus,
+    .config-form textarea:focus {
+        outline: none;
+        border-color: #F39C12;
+    }
+
+    .btn-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-sm-action {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    .btn-edit {
+        background: #3498DB;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #E74C3C;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #95a5a6;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    /* Responsive Improvements */
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 15px;
+        }
+
+        .social-tabs {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .social-tab {
+            width: 100%;
+            /* Tabs full width on mobile for easier tapping */
+            text-align: center;
+        }
+
+        .pub-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .pub-img {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 15px;
+        }
+
+        .pub-info {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .btn-actions {
+            width: 100%;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .foto-grid {
+            grid-template-columns: repeat(2, 1fr);
+            /* 2 columns on mobile */
+        }
+
+        .social-card-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .social-card-header button {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-share-alt" style="color: #F39C12;"></i> Gestión de Redes Sociales</h2>
+    </div>
+
+    <!-- Tabs -->
+    <div class="social-tabs">
+        <button class="social-tab active" onclick="showTab('publicaciones')">
+            <i class="fas fa-newspaper"></i> Publicaciones
+        </button>
+        <button class="social-tab" onclick="showTab('galeria')">
+            <i class="fas fa-images"></i> Galería de Fotos
+        </button>
+        <button class="social-tab" onclick="showTab('portada')">
+            <i class="fas fa-image"></i> Portada y Perfil
+        </button>
+        <button class="social-tab" onclick="showTab('info')">
+            <i class="fas fa-info-circle"></i> Información
+        </button>
+    </div>
+
+    <!-- TAB: Publicaciones -->
+    <div id="tab-publicaciones" class="tab-content active">
+        <div class="social-card">
+            <div class="social-card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-newspaper"></i> Publicaciones ({{ publicaciones|length }})</span>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaPublicacion">
+                    <i class="fas fa-plus"></i> Nueva Publicación
+                </button>
+            </div>
+            <div class="social-card-body">
+                {% if publicaciones %}
+                {% for pub in publicaciones %}
+                <div class="pub-item">
+                    {% if pub.imagen %}
+                    <img src="{{ url_for('static', filename=pub.imagen) }}" alt="" class="pub-img">
+                    {% else %}
+                    <div class="pub-img d-flex align-items-center justify-content-center" style="background: #f8f9fa;">
+                        <i class="fas {{ pub.icono }}" style="font-size: 2rem; color: #F39C12;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="pub-info">
+                        <div class="pub-title"><i class="fas {{ pub.icono }}" style="color: #1ABC9C;"></i> {{ pub.titulo
+                            }}</div>
+                        <div class="pub-text">{{ pub.contenido[:100] }}...</div>
+                        <small class="text-muted">{{ pub.fecha_publicacion.strftime('%d/%m/%Y') }} • {{ pub.categoria
+                            }}</small>
+                    </div>
+                    <div class="btn-actions">
+                        <button class="btn-sm-action btn-edit" data-id="{{ pub.id }}" data-titulo="{{ pub.titulo }}"
+                            data-contenido="{{ pub.contenido }}" data-icono="{{ pub.icono }}"
+                            data-categoria="{{ pub.categoria }}" onclick="editarPublicacionData(this)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <form action="{{ url_for('main.eliminar_publicacion', id=pub.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" class="btn-sm-action btn-delete"
+                                onclick="return confirm('¿Eliminar publicación?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-newspaper"></i>
+                    <p>No hay publicaciones. ¡Crea la primera!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: Galería -->
+    <div id="tab-galeria" class="tab-content">
+        <div class="social-card">
+            <div class="social-card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-images"></i> Galería de Fotos ({{ fotos|length }})</span>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#modalNuevaFoto">
+                    <i class="fas fa-plus"></i> Subir Foto
+                </button>
+            </div>
+            <div class="social-card-body">
+                {% if fotos %}
+                <div class="foto-grid">
+                    {% for foto in fotos %}
+                    <div class="foto-item">
+                        <img src="{{ url_for('static', filename=foto.imagen) }}" alt="{{ foto.titulo }}">
+                        <div class="foto-overlay">
+                            <strong>{{ foto.titulo }}</strong>
+                            <form action="{{ url_for('main.eliminar_foto', id=foto.id) }}" method="POST"
+                                style="display:inline; float:right;">
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('¿Eliminar foto?')" style="padding: 2px 8px;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-images"></i>
+                    <p>No hay fotos en la galería. ¡Sube la primera!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: Portada y Perfil -->
+    <div id="tab-portada" class="tab-content">
+        <div class="social-card">
+            <div class="social-card-header">
+                <i class="fas fa-image"></i> Imágenes de Portada y Perfil
+            </div>
+            <div class="social-card-body">
+                <form action="{{ url_for('main.guardar_imagenes_perfil') }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="row align-items-start">
+                        <!-- Foto de Portada -->
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <h5><i class="fas fa-mountain" style="color: #1ABC9C;"></i> Foto de Portada</h5>
+                                <p class="text-muted small">La imagen grande de fondo (ej: Cerro Rico)</p>
+                            </div>
+                            <div class="text-center mb-3"
+                                style="position: relative; border-radius: 15px; overflow: hidden; height: 180px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                                <img src="{{ url_for('static', filename=configuracion.get('foto_portada', 'img/cerro_potosi.jpg')) }}"
+                                    alt="Portada" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-upload"></i> Cambiar Foto de Portada</label>
+                                <input type="file" class="form-control" name="foto_portada" accept="image/*">
+                            </div>
+                        </div>
+
+                        <!-- Foto de Perfil -->
+                        <div class="col-md-6">
+                            <div class="text-center mb-3">
+                                <h5><i class="fas fa-user-circle" style="color: #F39C12;"></i> Foto de Perfil (Logo)
+                                </h5>
+                                <p class="text-muted small">El logo circular del laboratorio</p>
+                            </div>
+                            <div class="text-center mb-3 d-flex justify-content-center align-items-center"
+                                style="height: 180px;">
+                                <div
+                                    style="width: 160px; height: 160px; border-radius: 50%; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.15); border: 4px solid white; background: #f8f9fa;">
+                                    <img src="{{ url_for('static', filename=configuracion.get('foto_perfil', 'img/logo.jpg')) }}"
+                                        alt="Logo" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-upload"></i> Cambiar Logo/Perfil</label>
+                                <input type="file" class="form-control" name="foto_perfil" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn-add-new">
+                            <i class="fas fa-save"></i> Guardar Cambios de Imágenes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: Información -->
+    <div id="tab-info" class="tab-content">
+        <div class="social-card">
+            <div class="social-card-header">
+                <i class="fas fa-cog"></i> Información del Laboratorio
+            </div>
+            <div class="social-card-body">
+                <form action="{{ url_for('main.guardar_configuracion') }}" method="POST" class="config-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label><i class="fas fa-phone"></i> Teléfono</label>
+                            <input type="text" name="telefono" value="{{ configuracion.get('telefono', '') }}">
+
+                            <label><i class="fab fa-whatsapp"></i> WhatsApp</label>
+                            <input type="text" name="whatsapp" value="{{ configuracion.get('whatsapp', '') }}">
+
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" name="email" value="{{ configuracion.get('email', '') }}">
+
+                            <label><i class="fas fa-map-marker-alt"></i> Dirección</label>
+                            <input type="text" name="direccion" value="{{ configuracion.get('direccion', '') }}">
+
+                            <label><i class="fas fa-landmark"></i> Referencia</label>
+                            <input type="text" name="referencia" value="{{ configuracion.get('referencia', '') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label><i class="fas fa-clock"></i> Horario L-V</label>
+                            <input type="text" name="horario_semana"
+                                value="{{ configuracion.get('horario_semana', '') }}">
+
+                            <label><i class="fas fa-calendar-day"></i> Horario Sábado</label>
+                            <input type="text" name="horario_sabado"
+                                value="{{ configuracion.get('horario_sabado', '') }}">
+
+                            <label><i class="fas fa-calendar-times"></i> Horario Domingo</label>
+                            <input type="text" name="horario_domingo"
+                                value="{{ configuracion.get('horario_domingo', '') }}">
+
+                            <label><i class="fas fa-star"></i> Calificación</label>
+                            <input type="text" name="rating" value="{{ configuracion.get('rating', '') }}">
+
+                            <label><i class="fas fa-comments"></i> Reseñas</label>
+                            <input type="text" name="resenas" value="{{ configuracion.get('resenas', '') }}">
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label><i class="fas fa-award"></i> Experiencia</label>
+                            <textarea name="experiencia" rows="2">{{ configuracion.get('experiencia', '') }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label><i class="fas fa-certificate"></i> Certificación</label>
+                            <textarea name="certificacion"
+                                rows="2">{{ configuracion.get('certificacion', '') }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn-add-new">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Nueva Publicación -->
+<div class="modal fade" id="modalNuevaPublicacion" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #F39C12, #E67E22); color: white;">
+                <h5><i class="fas fa-plus-circle"></i> Nueva Publicación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('main.nueva_publicacion') }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading"></i> Título</label>
+                        <input type="text" class="form-control" name="titulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-align-left"></i> Contenido</label>
+                        <textarea class="form-control" name="contenido" rows="4" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-icons"></i> Icono</label>
+                            <select class="form-select" name="icono">
+                                <option value="fa-microscope">🔬 Microscopio</option>
+                                <option value="fa-dna">🧬 ADN</option>
+                                <option value="fa-baby">👶 Bebé</option>
+                                <option value="fa-heartbeat">💓 Corazón</option>
+                                <option value="fa-vial">🧪 Tubo de ensayo</option>
+                                <option value="fa-bolt">⚡ Rayo</option>
+                                <option value="fa-star">⭐ Estrella</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-tag"></i> Categoría</label>
+                            <input type="text" class="form-control" name="categoria" value="General">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-image"></i> Imagen</label>
+                        <input type="file" class="form-control" name="imagen" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning text-white"><i class="fas fa-save"></i>
+                        Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Nueva Foto -->
+<div class="modal fade" id="modalNuevaFoto" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #1ABC9C, #16A085); color: white;">
+                <h5><i class="fas fa-image"></i> Subir Foto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('main.nueva_foto') }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-heading"></i> Título</label>
+                        <input type="text" class="form-control" name="titulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-info-circle"></i> Descripción (opcional)</label>
+                        <input type="text" class="form-control" name="descripcion">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-image"></i> Imagen *</label>
+                        <input type="file" class="form-control" name="imagen" accept="image/*" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Subir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Editar Publicación -->
+<div class="modal fade" id="modalEditarPublicacion" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #3498DB, #2980B9); color: white;">
+                <h5><i class="fas fa-edit"></i> Editar Publicación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarPublicacion" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control" name="titulo" id="editTitulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contenido</label>
+                        <textarea class="form-control" name="contenido" id="editContenido" rows="4" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Icono</label>
+                            <select class="form-select" name="icono" id="editIcono">
+                                <option value="fa-microscope">🔬 Microscopio</option>
+                                <option value="fa-dna">🧬 ADN</option>
+                                <option value="fa-baby">👶 Bebé</option>
+                                <option value="fa-heartbeat">💓 Corazón</option>
+                                <option value="fa-vial">🧪 Tubo de ensayo</option>
+                                <option value="fa-bolt">⚡ Rayo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Categoría</label>
+                            <input type="text" class="form-control" name="categoria" id="editCategoria">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nueva Imagen (opcional)</label>
+                        <input type="file" class="form-control" name="imagen" accept="image/*">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="activo" id="editActivo" checked>
+                        <label class="form-check-label" for="editActivo">Publicación activa</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.social-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function editarPublicacionData(btn) {
+        const id = btn.dataset.id;
+        const titulo = btn.dataset.titulo;
+        const contenido = btn.dataset.contenido;
+        const icono = btn.dataset.icono;
+        const categoria = btn.dataset.categoria;
+
+        document.getElementById('formEditarPublicacion').action = '/publicacion/editar/' + id;
+        document.getElementById('editTitulo').value = titulo;
+        document.getElementById('editContenido').value = contenido;
+        document.getElementById('editIcono').value = icono;
+        document.getElementById('editCategoria').value = categoria;
+        new bootstrap.Modal(document.getElementById('modalEditarPublicacion')).show();
+    }
+</script>
+{% endblock %}
