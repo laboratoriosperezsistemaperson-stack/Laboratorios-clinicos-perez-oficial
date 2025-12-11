@@ -186,7 +186,7 @@ def eliminar_resultado(resultado_id):
         # Soft-delete en BD
         resultado.eliminado = True
         resultado.fecha_eliminacion = datetime.now()
-        resultado.eliminado_por = current_user.nombre
+        resultado.eliminado_por = current_user.username if current_user and hasattr(current_user, 'username') else 'admin'
         
         # Opcional: Mover archivo en Supabase a carpeta 'papelera'
         if resultado.archivo_pdf:
