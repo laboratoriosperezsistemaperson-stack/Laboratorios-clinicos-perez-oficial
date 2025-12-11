@@ -1,13 +1,20 @@
 ﻿import os
 import secrets
-from pathlib import Path
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from supabase import create_client, Client
 
 class PDFManager:
-    def __init__(self, upload_folder):
-        self.upload_folder = Path(upload_folder)
-        self.upload_folder.mkdir(parents=True, exist_ok=True)
+    def __init__(self, upload_folder=None):
+        # Inicializar Supabase
+        url: str = os.environ.get("SUPABASE_URL")
+        key: str = os.environ.get("SUPABASE_KEY")
+        if url and key:
+            self.supabase: Client = create_client(url, key)
+            self.bucket_name = "resultados"
+        else:
+            print("⚠️ ADVERTENCIA: No se encontraron credenciales de Supabase")
+            self.supabase = None
     
     def allowed_file(self, filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
@@ -19,36 +26,83 @@ class PDFManager:
         unique_id = secrets.token_hex(4)
         return f"{numero_orden}_{name_without_ext}_{timestamp}_{unique_id}.pdf"
     
-    def save_pdf(self, file, numero_orden):
+    def save_pdf(self, file, numero_orden, paciente_folder=None):
+        """
+        Sube el PDF a Supabase Storage.
+        paciente_folder se ignora porque Supabase usa estructura plana o carpetas virtuales.
+        Usaremos una carpeta virtual por año/mes para organizar mejor.
+        """
         if not file or file.filename == '':
             return False, None, "No se seleccionó ningún archivo"
         if not self.allowed_file(file.filename):
             return False, None, "El archivo debe ser PDF"
+        
+        if not self.supabase:
+            return False, None, "Error de configuración: Supabase no conectado"
+
         try:
             filename = self.generate_filename(numero_orden, file.filename)
-            filepath = self.upload_folder / filename
-            file.save(str(filepath))
-            relative_path = f"app/uploads/resultados/{filename}"
-            return True, relative_path, None
+            # Organizar por Año/Mes para no tener miles de archivos en root
+            folder = datetime.now().strftime('%Y/%m')
+            storage_path = f"{folder}/{filename}"
+            
+            # Leer contenido del archivo
+            file_content = file.read()
+            
+            # Subir a Supabase
+            # file_options={"content-type": "application/pdf"}
+            res = self.supabase.storage.from_(self.bucket_name).upload(
+                path=storage_path,
+                file=file_content,
+                file_options={"content-type": "application/pdf"}
+            )
+            
+            # Resetear puntero del archivo por si se usa después
+            file.seek(0)
+            
+            return True, storage_path, None
         except Exception as e:
-            return False, None, f"Error al guardar: {str(e)}"
+            return False, None, f"Error al guardar en Supabase: {str(e)}"
     
-    def get_full_path(self, relative_path):
-        if not relative_path:
+    def get_public_url(self, storage_path):
+        """Obtiene la URL pública del archivo"""
+        if not self.supabase or not storage_path:
             return None
-        path = Path(relative_path)
-        if path.is_absolute() and path.exists():
-            return path
-        base_dir = Path(__file__).parent.parent.absolute()
-        full_path = base_dir / relative_path
-        return full_path if full_path.exists() else None
-    
-    def delete_pdf(self, relative_path):
         try:
-            full_path = self.get_full_path(relative_path)
-            if full_path and full_path.exists():
-                full_path.unlink()
-                return True
+            return self.supabase.storage.from_(self.bucket_name).get_public_url(storage_path)
+        except:
+            return None
+
+    def delete_pdf(self, storage_path):
+        """Elimina el archivo de Supabase"""
+        if not self.supabase or not storage_path:
             return False
+        try:
+            self.supabase.storage.from_(self.bucket_name).remove([storage_path])
+            return True
         except:
             return False
+            
+    # Compatibilidad con código anterior (soft delete simulado moviendo a carpeta 'papelera')
+    # En Storage, 'mover' es copiar y borrar.
+    def move_to_trash(self, storage_path):
+        if not self.supabase or not storage_path:
+            return False
+        try:
+            new_path = f"papelera/{storage_path}"
+            self.supabase.storage.from_(self.bucket_name).move(storage_path, new_path)
+            return True, new_path
+        except Exception as e:
+            print(f"Error moviendo a papelera: {e}")
+            return False, storage_path
+
+    def restore_from_trash(self, storage_path):
+        if not self.supabase or not storage_path:
+            return False
+        try:
+            # Asumiendo que storage_path ya incluye 'papelera/'
+            new_path = storage_path.replace('papelera/', '', 1)
+            self.supabase.storage.from_(self.bucket_name).move(storage_path, new_path)
+            return True, new_path
+        except:
+            return False, storage_path

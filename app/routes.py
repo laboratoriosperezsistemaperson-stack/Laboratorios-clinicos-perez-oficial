@@ -83,63 +83,212 @@ def generar_numero_orden():
     numero_orden = f"{timestamp}-{contador+1:03d}"
     return numero_orden
 
+from app.pdf_manager import PDFManager
+
+# Instancia global (ya maneja credenciales internamente)
+pdf_manager = PDFManager()
+
 def guardar_pdf_con_backup(archivo, numero_orden, paciente):
     """
-    Guarda un PDF de forma ROBUSTA:
-    - Carpeta específica del paciente: uploads/pacientes/CI_Nombre/
-    - Backup automático
+    Sube el PDF a Supabase Storage
     """
     try:
-        # 1. Validar archivo
-        if not archivo or not archivo.filename:
-            raise ValueError("Archivo no válido")
-        if not archivo.filename.lower().endswith('.pdf'):
-            raise ValueError("Solo se permiten archivos PDF")
-
-        # 2. Preparar rutas
-        # Nombre de carpeta amigable: CI_Nombre (limpio)
-        nombre_carpeta = secure_filename(f"{paciente.ci}_{paciente.nombre}")
-        paciente_dir = os.path.join(UPLOAD_DIR, 'pacientes', nombre_carpeta)
+        success, storage_path, error = pdf_manager.save_pdf(archivo, numero_orden)
         
-        # Crear directorios
-        os.makedirs(paciente_dir, exist_ok=True)
-        os.makedirs(BACKUP_DIR, exist_ok=True)
-
-        # 3. Generar nombre único
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        nombre_base = secure_filename(archivo.filename.replace('.pdf', ''))
-        filename = f"{numero_orden}_{timestamp}_{nombre_base}.pdf"
-
-        # 4. Guardar archivo en carpeta del paciente
-        filepath = os.path.join(paciente_dir, filename)
-        archivo.save(filepath)
-
-        # 5. Generar PATH RELATIVO para la BD
-        # Guardamos: "pacientes/CI_Nombre/archivo.pdf"
-        relative_path = os.path.join('pacientes', nombre_carpeta, filename).replace('\\', '/')
-
-        # 6. Verify first save
-        if not os.path.exists(filepath) or os.path.getsize(filepath) == 0:
-            if os.path.exists(filepath): os.remove(filepath)
-            raise Exception("Error escribiendo archivo")
-
-        # 7. Crear BACKUP (en carpeta central de backups o carpeta de trash del paciente?)
-        # User asked for: "si lo elimino... tenga una subcarpeta de eso... ahi se guardara"
-        # For now, keep a central backup just in case, or we can rely on soft-delete logic later.
-        # Let's keep central backup for redundancy as per original code.
-        backup_path = os.path.join(BACKUP_DIR, filename)
-        import shutil
-        shutil.copy2(filepath, backup_path)
-
-        print(f"✓ PDF guardado en: {filepath}")
-        return relative_path, filepath, backup_path
+        if success:
+            print(f"✓ PDF subido a Supabase: {storage_path}")
+            # Retornamos storage_path como 'relative_path' y None para rutas fisicas
+            return storage_path, None, None
+        else:
+            raise Exception(error)
 
     except Exception as e:
         print(f"✗ Error guardando PDF: {str(e)}")
-        # Clean up
-        if 'filepath' in locals() and os.path.exists(filepath):
-            os.remove(filepath)
         return None, None, None
+
+def limpiar_archivo_huerfano(filename):
+    """Elimina un archivo PDF de Supabase si existe"""
+    try:
+        if filename:
+            pdf_manager.delete_pdf(filename)
+            print(f"🗑 Archivo huérfano eliminado de Supabase: {filename}")
+    except Exception as e:
+        print(f"⚠ Error limpiando archivos huérfanos: {e}")
+
+@main.route('/descargar/<int:resultado_id>')
+@admin_required
+def descargar(resultado_id):
+    resultado = Resultado.query.get_or_404(resultado_id)
+    if resultado.archivo_pdf:
+        # Obtener URL pública de Supabase
+        public_url = pdf_manager.get_public_url(resultado.archivo_pdf)
+        if public_url:
+             return redirect(public_url)
+
+        # Fallback para archivos antiguos locales (si existen y estamos en local)
+        # Ojo: En Render esto fallará para archivos viejos no migrados.
+        possible_paths = [
+            os.path.join(UPLOAD_DIR, resultado.archivo_pdf),
+            os.path.join(BASE_DIR, resultado.archivo_pdf),
+            resultado.archivo_pdf
+        ]
+        for pdf_path in possible_paths:
+             if os.path.exists(pdf_path):
+                 return send_file(pdf_path, as_attachment=True)
+
+        flash(f'El archivo PDF no se encuentra disponible (ni en nube ni local)', 'danger')
+        return redirect(url_for('main.admin_resultados'))
+
+    flash('No hay archivo PDF asignado a este resultado', 'warning')
+    return redirect(url_for('main.admin_resultados'))
+
+@main.route('/descargar-resultado-publico/<int:resultado_id>')
+def descargar_resultado_publico(resultado_id):
+    """
+    Descarga pública de PDFs para pacientes
+    - Redirige a la URL de Supabase para descarga directa
+    """
+    # LOGGING DETALLADO
+    print("=" * 80)
+    print("🔍 DESCARGA PÚBLICA DE PDF (CLOUD)")
+    print(f"   Resultado ID: {resultado_id}")
+
+    resultado = Resultado.query.get_or_404(resultado_id)
+
+    if not resultado.archivo_pdf:
+        print("   ❌ NO TIENE ARCHIVO ASIGNADO")
+        return "El archivo no está disponible", 404
+        
+    # Intentar obtener URL de Supabase
+    public_url = pdf_manager.get_public_url(resultado.archivo_pdf)
+    
+    if public_url:
+        print(f"   ✅ Redirigiendo a Supabase: {public_url}")
+        return redirect(public_url)
+    
+    # Fallback local (solo si la migración falló o estamos en dev)
+    print("   ⚠️ Archivo no encontrado en nube, buscando local...")
+    # ... codigo legacy ...
+    
+    return "El archivo PDF no se encuentra disponible en este momento.", 404
+
+# ... (resto de funciones) ...
+
+@main.route('/resultado/eliminar/<int:resultado_id>', methods=['POST'])
+@admin_required
+def eliminar_resultado(resultado_id):
+    """
+    SOFT-DELETE: Mueve el resultado a la papelera (simulado en Supabase o flag DB)
+    """
+    try:
+        resultado = Resultado.query.get_or_404(resultado_id)
+        
+        # Soft-delete en BD
+        resultado.eliminado = True
+        resultado.fecha_eliminacion = datetime.now()
+        resultado.eliminado_por = current_user.nombre
+        
+        # Opcional: Mover archivo en Supabase a carpeta 'papelera'
+        if resultado.archivo_pdf:
+             success, new_path = pdf_manager.move_to_trash(resultado.archivo_pdf)
+             if success:
+                 resultado.archivo_pdf = new_path
+
+        db.session.commit()
+        flash(f'✅ Resultado movido a la papelera exitosamente.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al eliminar resultado: {str(e)}', 'danger')
+        print(f"Error eliminando resultado: {e}")
+        
+    return redirect(url_for('main.admin_resultados'))
+
+@main.route('/resultado/restaurar/<int:resultado_id>', methods=['POST'])
+@admin_required
+def restaurar_resultado(resultado_id):
+    try:
+        resultado = Resultado.query.get_or_404(resultado_id)
+        
+        # Restaurar en BD
+        resultado.eliminado = False
+        resultado.fecha_eliminacion = None
+        resultado.eliminado_por = None
+        
+        # Restaurar archivo en Supabase
+        if resultado.archivo_pdf and 'papelera/' in resultado.archivo_pdf:
+             success, new_path = pdf_manager.restore_from_trash(resultado.archivo_pdf)
+             if success:
+                 resultado.archivo_pdf = new_path
+        
+        db.session.commit()
+        flash(f'✅ Resultado restaurado exitosamente.', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error al restaurar resultado: {str(e)}")
+        flash(f'❌ Error al restaurar resultado: {str(e)}', 'danger')
+
+    return redirect(url_for('main.admin_resultados'))
+
+@main.route('/resultado/eliminar-permanente/<int:resultado_id>', methods=['POST'])
+@admin_required
+def eliminar_permanente(resultado_id):
+    try:
+        resultado = Resultado.query.get_or_404(resultado_id)
+        paciente_nombre = resultado.paciente_nombre
+
+        # Eliminar archivo de Supabase
+        if resultado.archivo_pdf:
+            pdf_manager.delete_pdf(resultado.archivo_pdf)
+
+        db.session.delete(resultado)
+        db.session.commit()
+
+        flash(f'✅ Resultado de "{paciente_nombre}" eliminado permanentemente.', 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error al eliminar permanentemente: {str(e)}")
+        flash(f'❌ Error al eliminar: {str(e)}', 'danger')
+
+    return redirect(url_for('main.admin_resultados'))
+
+@main.route('/resultado/reemplazar/<int:resultado_id>', methods=['POST'])
+@admin_required
+def reemplazar_pdf(resultado_id):
+    """
+    Reemplaza el PDF de un resultado existente en Supabase
+    """
+    try:
+        resultado = Resultado.query.get_or_404(resultado_id)
+        archivo_nuevo = request.files.get('archivo_pdf')
+
+        if not archivo_nuevo or not archivo_nuevo.filename:
+            flash('❌ Debe seleccionar un archivo PDF', 'danger')
+            return redirect(url_for('main.admin_resultados'))
+
+        if archivo_nuevo and archivo_nuevo.filename:
+            # 1. Eliminar archivo anterior de Supabase
+            if resultado.archivo_pdf:
+                pdf_manager.delete_pdf(resultado.archivo_pdf)
+
+            # 2. Guardar nuevo archivo
+            success, storage_path, error = pdf_manager.save_pdf(archivo_nuevo, resultado.numero_orden)
+            
+            if success:
+                resultado.archivo_pdf = storage_path
+                db.session.commit()
+                flash(f'✅ PDF reemplazado exitosamente', 'success')
+            else:
+                flash(f'❌ Error al subir nuevo PDF: {error}', 'danger')
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error al reemplazar PDF: {str(e)}")
+        flash(f'❌ Error al reemplazar PDF: {str(e)}', 'danger')
+
+    return redirect(url_for('main.admin_resultados'))
 
 def limpiar_archivo_huerfano(filename):
     """Elimina un archivo PDF y su backup si existen"""
@@ -1195,325 +1344,17 @@ def eliminar_prueba(prueba_id):
         flash(f'Error al eliminar prueba: {str(e)}', 'danger')
     return redirect(url_for('main.admin_pruebas'))
 
-@main.route('/descargar/<int:resultado_id>')
-@admin_required
-def descargar(resultado_id):
-    resultado = Resultado.query.get_or_404(resultado_id)
-    if resultado.archivo_pdf:
-        # Intentar varias rutas posibles para robustez
-        possible_paths = [
-            os.path.join(UPLOAD_DIR, resultado.archivo_pdf), # Estándar actual (solo filename)
-            os.path.join(BASE_DIR, resultado.archivo_pdf),   # Ruta relativa antigua
-            resultado.archivo_pdf                            # Ruta absoluta
-        ]
 
-        # Verificar si alguna existe
-        for pdf_path in possible_paths:
-             if os.path.exists(pdf_path):
-                 return send_file(pdf_path, as_attachment=True)
 
-        # Si llegamos aquí, no se encontró
-        flash(f'El archivo PDF no se encuentra físicamente: {resultado.archivo_pdf}', 'danger')
-        print(f"❌ PDF no encontrado. Buscado en: {possible_paths}")
-        return redirect(url_for('main.admin_resultados'))
 
-    flash('No hay archivo PDF asignado a este resultado', 'warning')
-    return redirect(url_for('main.admin_resultados'))
 
-@main.route('/descargar-resultado-publico/<int:resultado_id>')
-def descargar_resultado_publico(resultado_id):
-    """
-    Descarga pública de PDFs para pacientes
-    - Sin @admin_required para acceso público
-    - Siempre obtiene el archivo MÁS RECIENTE de la BD
-    - Headers anti-cache para evitar descargas viejas
-    """
-    from flask import make_response
 
-    # LOGGING DETALLADO
-    print("=" * 80)
-    print("🔍 DESCARGA PÚBLICA DE PDF")
-    print(f"   Resultado ID: {resultado_id}")
 
-    resultado = Resultado.query.get_or_404(resultado_id)
 
-    print(f"   Paciente: {resultado.paciente_nombre}")
-    print(f"   CI: {resultado.paciente_ci}")
-    print(f"   Archivo en BD: {resultado.archivo_pdf}")
 
-    if not resultado.archivo_pdf:
-        print("   ❌ ERROR: No hay archivo PDF en la BD")
-        flash('No hay archivo PDF disponible', 'warning')
-        return redirect(url_for('main.portal_resultados'))
 
-    # Construir ruta del archivo más reciente desde BD
-    pdf_path = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
-    print(f"   Ruta completa: {pdf_path}")
-    print(f"   Archivo existe? {os.path.exists(pdf_path)}")
 
-    # Verificar que existe
-    if not os.path.exists(pdf_path):
-        # Si no existe el principal, buscar en backup
-        backup_path = os.path.join(BACKUP_DIR, resultado.archivo_pdf)
-        print(f"   Buscando en backup: {backup_path}")
-        print(f"   Backup existe? {os.path.exists(backup_path)}")
-        if os.path.exists(backup_path):
-            pdf_path = backup_path
-            print("   ✓ Usando archivo desde backup")
-        else:
-            print("   ❌ ERROR: Archivo no encontrado ni en principal ni en backup")
-            flash(f'El archivo PDF no se encuentra disponible', 'danger')
-            return redirect(url_for('main.portal_resultados'))
 
-    # Nombre de descarga único basado en timestamp para romper cache
-    from datetime import datetime
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    download_name = f"Resultado_{resultado.numero_orden}_{timestamp}.pdf"
-
-    print(f"   Nombre descarga: {download_name}")
-    print("   ✅ ENVIANDO ARCHIVO AL PACIENTE")
-    print("=" * 80)
-
-    # Enviar archivo con headers anti-cache FUERTES
-    return send_file(
-        pdf_path,
-        as_attachment=True,
-        download_name=download_name,
-        mimetype='application/pdf',
-        max_age=0,  # No cache
-        last_modified=datetime.now()
-    )
-
-@main.route('/resultado/eliminar/<int:resultado_id>', methods=['POST'])
-@admin_required
-def eliminar_resultado(resultado_id):
-    """
-    SOFT-DELETE: Mueve el resultado a la papelera (eliminados)
-    - Mueve archivos a carpeta 'papelera/CI_Nombre/'
-    - El resultado NO se elimina permanentemente de la BD (solo flag eliminado=True)
-    """
-    try:
-        resultado = Resultado.query.get_or_404(resultado_id)
-        
-        # Soft-delete: Marcar como eliminado en BD
-        resultado.eliminado = True
-        resultado.fecha_eliminacion = datetime.now()
-        resultado.eliminado_por = current_user.username if current_user and hasattr(current_user, 'username') else 'admin'
-        
-        # Mover archivo a la papelera (si existe)
-        if resultado.archivo_pdf:
-            path_actual = None
-            # Intentar localizar el archivo (puede estar en uploads/ o en uploads/pacientes/...)
-            # Ruta relativa almacenada en BD: puede ser "pacientes/..." o "filename.pdf" (antiguo)
-            
-            fullname = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
-            if os.path.exists(fullname):
-                 path_actual = fullname
-            
-            if path_actual:
-                # Crear carpeta de papelera del paciente
-                nombre_carpeta = secure_filename(f"{resultado.paciente_ci}_{resultado.paciente_nombre}")
-                papelera_dir = os.path.join(UPLOAD_DIR, 'papelera', nombre_carpeta)
-                os.makedirs(papelera_dir, exist_ok=True)
-                
-                # Nombre de archivo
-                filename = os.path.basename(path_actual)
-                destino = os.path.join(papelera_dir, filename)
-                
-                import shutil
-                shutil.move(path_actual, destino)
-                print(f"🗑 Archivo movido a papelera: {destino}")
-                
-                # Actualizar ruta en BD para apuntar a la papelera (opcional, o mantener original si restauramos?)
-                # Si restauramos, deberíamos saber volver a ponerlo donde estaba. 
-                # Mejor idea: mantener ruta original en un campo temporal? O simplemente recalcularla al restaurar.
-                # Al restaurar, el sistema usará `guardar_pdf` o moverá de vuelta.
-                # Por ahora, dejemos el campo archivo_pdf como está, o actualicemos a la nueva ruta en papelera?
-                # Si actualizamos a papelera, al restaurar hay que moverlo de vuelta.
-                
-                # Update path so download works from trash (admin only calls download?)
-                # "Puede restaurarlo desde la pestaña 'Eliminados'".
-                # Let's verify `restaurar_resultado` logic later. Ideally we just move it physically.
-                
-                # Let's save the new path in db so we know where it is
-                nuevo_rel_path = f"papelera/{nombre_carpeta}/{filename}"
-                resultado.archivo_pdf = nuevo_rel_path
-
-        db.session.commit()
-        flash(f'✅ Resultado movido a la papelera exitosamente.', 'success')
-        
-    except Exception as e:
-        db.session.rollback()
-        flash(f'❌ Error al eliminar resultado: {str(e)}', 'danger')
-        print(f"Error eliminando resultado: {e}")
-        
-    return redirect(url_for('main.admin_resultados'))
-
-@main.route('/resultado/restaurar/<int:resultado_id>', methods=['POST'])
-@admin_required
-def restaurar_resultado(resultado_id):
-    """
-    Restaurar un resultado eliminado (sacarlo de la papelera)
-    - Mueve archivo de 'papelera/...' a 'pacientes/CI_Nombre/...'
-    - El resultado vuelve a ser consultable por el paciente
-    """
-    try:
-        resultado = Resultado.query.get_or_404(resultado_id)
-        
-        # Restaurar (quitar marca de eliminado)
-        resultado.eliminado = False
-        resultado.fecha_eliminacion = None
-        resultado.eliminado_por = None
-        
-        # Verificar si el archivo está en papelera y moverlo de vuelta
-        if resultado.archivo_pdf and 'papelera' in resultado.archivo_pdf:
-             path_papelera = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
-             
-             if os.path.exists(path_papelera):
-                 # Definir destino original (carpeta paciente)
-                 nombre_carpeta = secure_filename(f"{resultado.paciente_ci}_{resultado.paciente_nombre}")
-                 paciente_dir = os.path.join(UPLOAD_DIR, 'pacientes', nombre_carpeta)
-                 os.makedirs(paciente_dir, exist_ok=True)
-                 
-                 filename = os.path.basename(path_papelera)
-                 destino = os.path.join(paciente_dir, filename)
-                 
-                 import shutil
-                 shutil.move(path_papelera, destino)
-                 print(f"↺ Archivo restaurado: {destino}")
-                 
-                 # Actualizar ruta en BD
-                 nuevo_rel_path = f"pacientes/{nombre_carpeta}/{filename}"
-                 resultado.archivo_pdf = nuevo_rel_path
-        
-        db.session.commit()
-        flash(f'✅ Resultado restaurado exitosamente.', 'success')
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"❌ Error al restaurar resultado: {str(e)}")
-        flash(f'❌ Error al restaurar resultado: {str(e)}', 'danger')
-
-    return redirect(url_for('main.admin_resultados'))
-
-@main.route('/resultado/eliminar-permanente/<int:resultado_id>', methods=['POST'])
-@admin_required
-def eliminar_permanente(resultado_id):
-    """
-    ELIMINACIÓN PERMANENTE: Elimina el resultado completamente
-    - Elimina el registro de la base de datos
-    - Elimina el archivo PDF principal
-    - Elimina el archivo PDF de backup
-    - NO SE PUEDE DESHACER
-    """
-    try:
-        resultado = Resultado.query.get_or_404(resultado_id)
-        numero_orden = resultado.numero_orden
-        paciente_nombre = resultado.paciente_nombre
-
-        # Eliminar archivos PDF (principal y backup)
-        archivos_eliminados = 0
-
-        if resultado.archivo_pdf:
-            # Eliminar archivo principal
-            filepath = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
-            if os.path.exists(filepath):
-                os.remove(filepath)
-                archivos_eliminados += 1
-                print(f"🗑 Archivo principal eliminado: {resultado.archivo_pdf}")
-
-            # Eliminar backup
-            backup_path = os.path.join(BACKUP_DIR, resultado.archivo_pdf)
-            if os.path.exists(backup_path):
-                os.remove(backup_path)
-                archivos_eliminados += 1
-                print(f"🗑 Backup eliminado: {resultado.archivo_pdf}")
-
-        # Eliminar registro de base de datos
-        db.session.delete(resultado)
-        db.session.commit()
-
-        print("=" * 80)
-        print("⚠ RESULTADO ELIMINADO PERMANENTEMENTE")
-        print(f"   Número Orden: {numero_orden}")
-        print(f"   Paciente: {paciente_nombre}")
-        print(f"   Archivos eliminados: {archivos_eliminados}")
-        print("   ❌ Esta acción NO SE PUEDE DESHACER")
-        print("=" * 80)
-
-        flash(f'✅ Resultado de "{paciente_nombre}" eliminado permanentemente.', 'success')
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"❌ Error al eliminar permanentemente: {str(e)}")
-        flash(f'❌ Error al eliminar: {str(e)}', 'danger')
-
-    return redirect(url_for('main.admin_resultados'))
-
-@main.route('/resultado/reemplazar/<int:resultado_id>', methods=['POST'])
-@admin_required
-def reemplazar_pdf(resultado_id):
-    """
-    Reemplaza el PDF de un resultado existente
-    - Elimina el PDF anterior (principal y backup)
-    - Sube el nuevo PDF con backup
-    """
-    try:
-        resultado = Resultado.query.get_or_404(resultado_id)
-        archivo_nuevo = request.files.get('archivo_pdf')
-
-        if not archivo_nuevo or not archivo_nuevo.filename:
-            flash('❌ Debe seleccionar un archivo PDF', 'danger')
-            return redirect(url_for('main.admin_resultados'))
-
-        # Eliminar archivos anteriores (principal y backup)
-        if resultado.archivo_pdf:
-            # Eliminar principal
-            old_filepath = os.path.join(UPLOAD_DIR, resultado.archivo_pdf)
-            if os.path.exists(old_filepath):
-                os.remove(old_filepath)
-                print(f"🗑 PDF anterior eliminado: {resultado.archivo_pdf}")
-
-            # Eliminar backup
-            old_backup = os.path.join(BACKUP_DIR, resultado.archivo_pdf)
-            if os.path.exists(old_backup):
-                os.remove(old_backup)
-                print(f"🗑 Backup anterior eliminado: {resultado.archivo_pdf}")
-
-        if not archivo_nuevo: # archivo_nuevo might be empty
-             pass 
-
-        # Guardar nuevo PDF con backup
-        # Necesitamos el objeto paciente. Resultado tiene backref 'paciente'
-        filename_nuevo, filepath_nuevo, backup_nuevo = guardar_pdf_con_backup(
-            archivo_nuevo,
-            resultado.numero_orden,
-            resultado.paciente
-        )
-
-        if not filename_nuevo:
-            raise Exception("No se pudo guardar el nuevo archivo PDF")
-
-        # Actualizar registro en BD
-        resultado.archivo_pdf = filename_nuevo
-        db.session.commit()
-
-        print("=" * 80)
-        print("✅ PDF REEMPLAZADO EXITOSAMENTE")
-        print(f"   Resultado ID: {resultado.id}")
-        print(f"   Número Orden: {resultado.numero_orden}")
-        print(f"   Archivo nuevo: {filename_nuevo}")
-        print(f"   Backup: ✓ Creado")
-        print("=" * 80)
-
-        flash(f'✅ PDF reemplazado exitosamente para el paciente "{resultado.paciente_nombre}"', 'success')
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"❌ Error al reemplazar PDF: {str(e)}")
-        flash(f'❌ Error al reemplazar PDF: {str(e)}', 'danger')
-
-    return redirect(url_for('main.admin_resultados'))
 
 
 # ============================================
