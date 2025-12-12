@@ -83,10 +83,11 @@ def generar_numero_orden():
     numero_orden = f"{timestamp}-{contador+1:03d}"
     return numero_orden
 
-from app.pdf_manager import PDFManager
+from app.pdf_manager import FileManager
 
 # Instancia global (ya maneja credenciales internamente)
-pdf_manager = PDFManager()
+pdf_manager = FileManager(UPLOAD_DIR)
+file_manager = pdf_manager # Alias para compatibilidad y semántica
 
 def guardar_pdf_con_backup(archivo, numero_orden, paciente):
     """
@@ -610,13 +611,7 @@ def editar_paciente(paciente_id):
         flash(f'Error: {str(e)}', 'danger')
     return redirect(url_for('main.admin_pacientes'))
 
-from app.pdf_manager import FileManager # Changed class name
 
-# Inicializar FileManager
-# Assuming UPLOAD_FOLDER is defined globally or imported, similar to UPLOAD_DIR
-# For now, using UPLOAD_DIR as a placeholder if UPLOAD_FOLDER is not explicitly defined.
-# If UPLOAD_FOLDER is meant to be a different configuration, it should be set up.
-file_manager = FileManager(UPLOAD_DIR) # Alias
 
 @main.route('/paciente/eliminar/<int:paciente_id>', methods=['POST'])
 @admin_required
