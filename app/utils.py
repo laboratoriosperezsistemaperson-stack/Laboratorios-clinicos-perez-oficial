@@ -21,3 +21,14 @@ def admin_required(f):
             return redirect(url_for('main.index'))
         return f(*args, **kwargs)
     return decorated_function
+
+def resolve_image_url(path):
+    """
+    Filtro Jinja2 para resolver URLs de imágenes.
+    Maneja URLs absolutas (Supabase) y relativas (Static).
+    """
+    if not path:
+        return ''
+    if path.startswith('http') or path.startswith('//'):
+        return path
+    return url_for('static', filename=path)

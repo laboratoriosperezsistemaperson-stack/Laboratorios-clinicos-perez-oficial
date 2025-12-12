@@ -352,8 +352,8 @@
 
 <!-- COVER IMAGE - CERRO CON PUNTA VISIBLE - CLICK PARA VER COMPLETA -->
 <div class="fb-cover" onclick="openCoverModal()" style="cursor: pointer;" title="Clic para ver imagen completa">
-    <img src="{{ url_for('static', filename=config.get('foto_portada', 'img/cerro_potosi.jpg')) }}"
-        alt="Cerro Rico de Potosí" id="coverImage">
+    <img src="{{ config.get('foto_portada', 'img/cerro_potosi.jpg') | resolve_image_url }}" alt="Cerro Rico de Potosí"
+        id="coverImage">
 </div>
 
 <!-- HEADER -->
@@ -361,8 +361,7 @@
     <div class="fb-header-content">
         <div class="fb-profile-row">
             <div class="fb-avatar">
-                <img src="{{ url_for('static', filename=config.get('foto_perfil', 'img/logo.jpg')) }}"
-                    alt="Laboratorio Pérez">
+                <img src="{{ config.get('foto_perfil', 'img/logo.jpg') | resolve_image_url }}" alt="Laboratorio Pérez">
             </div>
             <div class="fb-info">
                 <h1 class="fb-name">Laboratorio Clínico <span>Pérez</span></h1>
@@ -408,7 +407,7 @@
             <p class="fb-post-text">{{ pub.contenido }}</p>
         </div>
         {% if pub.imagen %}
-        <img src="{{ url_for('static', filename=pub.imagen) }}" alt="{{ pub.titulo }}" class="fb-post-image">
+        <img src="{{ pub.imagen | resolve_image_url }}" alt="{{ pub.titulo }}" class="fb-post-image">
         {% endif %}
         <div class="fb-post-share">
             <a href="https://wa.me/?text={{ pub.titulo|urlencode }}%20-%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"

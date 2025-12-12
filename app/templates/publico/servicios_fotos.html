@@ -473,7 +473,7 @@
     <div class="photos-grid">
         {% for foto in fotos %}
         <div class="photo-item" onclick="openModal({{ loop.index0 }})">
-            <img src="{{ url_for('static', filename=foto.imagen) }}" alt="{{ foto.titulo }}">
+            <img src="{{ foto.imagen | resolve_image_url }}" alt="{{ foto.titulo }}">
             <div class="photo-overlay"><span class="photo-title">{{ foto.titulo }}</span></div>
         </div>
         {% endfor %}
@@ -544,7 +544,7 @@
     // Fotos dinámicas desde la base de datos
     const photos = [
         {% for foto in fotos %}
-    { src: "{{ url_for('static', filename=foto.imagen) }}", title: "{{ foto.titulo }}" } {% if not loop.last %}, {% endif %}
+    { src: "{{ foto.imagen | resolve_image_url }}", title: "{{ foto.titulo }}" } {% if not loop.last %}, {% endif %}
     {% endfor %}
     ];
     {% else %}

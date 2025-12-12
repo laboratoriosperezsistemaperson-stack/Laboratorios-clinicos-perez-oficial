@@ -627,8 +627,12 @@
                             <td><span class="id-badge">{{ p.id }}</span></td>
                             <td>
                                 {% if p.imagen %}
+                                {% if p.imagen and 'http' in p.imagen %}
+                                <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="prueba-imagen">
+                                {% else %}
                                 <img src="{{ url_for('static', filename='uploads/pruebas/' + p.imagen) }}"
                                     alt="{{ p.nombre }}" class="prueba-imagen">
+                                {% endif %}
                                 {% else %}
                                 <div class="prueba-imagen-placeholder">
                                     <i class="fas fa-flask"></i>
@@ -939,7 +943,11 @@
 
                 // Mostrar imagen si existe
                 if (data.imagen) {
-                    document.getElementById('verImagen').src = '/static/uploads/pruebas/' + data.imagen;
+                    if (data.imagen.startsWith('http')) {
+                        document.getElementById('verImagen').src = data.imagen;
+                    } else {
+                        document.getElementById('verImagen').src = '/static/uploads/pruebas/' + data.imagen;
+                    }
                     document.getElementById('verImagen').style.display = 'block';
                     document.getElementById('verImagenContainer').style.display = 'none';
                 } else {
@@ -968,7 +976,11 @@
 
                 // Mostrar preview de imagen actual si existe
                 if (data.imagen) {
-                    document.getElementById('editImagenActual').src = '/static/uploads/pruebas/' + data.imagen;
+                    if (data.imagen.startsWith('http')) {
+                        document.getElementById('editImagenActual').src = data.imagen;
+                    } else {
+                        document.getElementById('editImagenActual').src = '/static/uploads/pruebas/' + data.imagen;
+                    }
                     document.getElementById('editImagenPreview').style.display = 'block';
                 } else {
                     document.getElementById('editImagenPreview').style.display = 'none';

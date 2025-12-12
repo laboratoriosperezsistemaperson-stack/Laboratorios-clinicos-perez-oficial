@@ -22,6 +22,9 @@ def create_app():
     app.register_blueprint(main)
     app.register_blueprint(auth)
 
+    from app.utils import resolve_image_url
+    app.jinja_env.filters['resolve_image_url'] = resolve_image_url
+
     # ============ OPTIMIZACIÓN STATIC FILES (WHITENOISE) ============
     from whitenoise import WhiteNoise
     # Servir archivos estáticos de forma eficiente
