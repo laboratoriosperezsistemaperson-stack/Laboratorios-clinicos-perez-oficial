@@ -410,12 +410,10 @@
         <img src="{{ pub.imagen | resolve_image_url }}" alt="{{ pub.titulo }}" class="fb-post-image">
         {% endif %}
         <div class="fb-post-share">
-            <a href="https://wa.me/?text={{ pub.titulo|urlencode }}%20-%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-whatsapp">
+            <a href="#" onclick="compartirWhatsApp('{{ pub.titulo }}'); return false;" class="share-btn share-whatsapp">
                 <i class="fab fa-whatsapp"></i> Compartir
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-facebook">
+            <a href="#" onclick="compartirFacebook(); return false;" class="share-btn share-facebook">
                 <i class="fab fa-facebook-f"></i> Compartir
             </a>
         </div>
@@ -440,12 +438,11 @@
         <img src="{{ url_for('static', filename='img/analisis_especializados.jpg') }}" alt="Análisis"
             class="fb-post-image">
         <div class="fb-post-share">
-            <a href="https://wa.me/?text=Laboratorio%20Pérez%20Potosí%20-%20Análisis%20Especializados%20https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-whatsapp">
+            <a href="#" onclick="compartirWhatsApp('Análisis Especializados'); return false;"
+                class="share-btn share-whatsapp">
                 <i class="fab fa-whatsapp"></i> Compartir
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-facebook">
+            <a href="#" onclick="compartirFacebook(); return false;" class="share-btn share-facebook">
                 <i class="fab fa-facebook-f"></i> Compartir
             </a>
         </div>
@@ -466,12 +463,11 @@
         </div>
         <img src="{{ url_for('static', filename='img/pruebas_adn.jpg') }}" alt="ADN" class="fb-post-image">
         <div class="fb-post-share">
-            <a href="https://wa.me/?text=Pruebas%20de%20ADN%20en%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-whatsapp">
+            <a href="#" onclick="compartirWhatsApp('Pruebas de ADN y Paternidad'); return false;"
+                class="share-btn share-whatsapp">
                 <i class="fab fa-whatsapp"></i> Compartir
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-facebook">
+            <a href="#" onclick="compartirFacebook(); return false;" class="share-btn share-facebook">
                 <i class="fab fa-facebook-f"></i> Compartir
             </a>
         </div>
@@ -492,12 +488,11 @@
         </div>
         <img src="{{ url_for('static', filename='img/pruebas_embarazo.jpg') }}" alt="Embarazo" class="fb-post-image">
         <div class="fb-post-share">
-            <a href="https://wa.me/?text=Pruebas%20de%20Embarazo%20en%20Laboratorio%20Pérez%20https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-whatsapp">
+            <a href="#" onclick="compartirWhatsApp('Pruebas de Embarazo'); return false;"
+                class="share-btn share-whatsapp">
                 <i class="fab fa-whatsapp"></i> Compartir
             </a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=https://laboratorio-perez.onrender.com/servicios"
-                target="_blank" class="share-btn share-facebook">
+            <a href="#" onclick="compartirFacebook(); return false;" class="share-btn share-facebook">
                 <i class="fab fa-facebook-f"></i> Compartir
             </a>
         </div>
@@ -585,6 +580,18 @@
             if (e.key === 'Escape') closeCoverModal();
         }
     });
+
+    // Funciones de compartir con URL dinámica
+    function compartirWhatsApp(titulo) {
+        const url = window.location.href;
+        const texto = encodeURIComponent(titulo + ' - Laboratorio Clínico Pérez - ' + url);
+        window.open('https://wa.me/?text=' + texto, '_blank');
+    }
+
+    function compartirFacebook() {
+        const url = encodeURIComponent(window.location.href);
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank');
+    }
 </script>
 
 {% endblock %}

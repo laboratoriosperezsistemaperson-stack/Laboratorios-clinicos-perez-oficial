@@ -11,9 +11,10 @@ class FileManager:
         key: str = os.environ.get("SUPABASE_KEY")
         if url and key:
             self.supabase: Client = create_client(url, key)
+            # BUCKET PRINCIPAL: labos2026 para PDFs y datos de pacientes
             self.buckets = {
-                "pdf": "resultados",
-                "img": "imagenes"
+                "pdf": "labos2026",  # Bucket principal para resultados de pacientes
+                "img": "imagenes"     # Bucket para imágenes de redes sociales
             }
         else:
             print("⚠️ ADVERTENCIA: No se encontraron credenciales de Supabase")
@@ -107,7 +108,7 @@ class FileManager:
         if not self.supabase or not storage_path:
             return None
         try:
-            bucket = self.buckets.get(bucket_type, 'resultados')
+            bucket = self.buckets.get(bucket_type, 'labos2026')
             # Detectar bucket basado en extensión si no se especifica bien (fallback)
             if bucket_type == 'pdf' and not storage_path.endswith('.pdf'):
                  bucket = self.buckets['img'] # Asumir imagen si no es pdf
@@ -121,7 +122,7 @@ class FileManager:
         if not self.supabase or not storage_path:
             return False
         try:
-            bucket = self.buckets.get(bucket_type, 'resultados')
+            bucket = self.buckets.get(bucket_type, 'labos2026')
              # Auto-detect bucket fallback
             if bucket_type == 'pdf' and not storage_path.endswith('.pdf'):
                  bucket = self.buckets['img']
@@ -157,3 +158,60 @@ class FileManager:
             return True, new_path
         except:
             return False, storage_path
+
+    def rename_patient_folder(self, old_ci, old_nombre, new_ci, new_nombre):
+        """
+        Renombra la carpeta de un paciente en Supabase Storage.
+        Mueve todos los archivos de la carpeta antigua a la nueva ubicación.
+        Retorna: (success, list_of_updated_paths, error_message)
+        """
+        if not self.supabase:
+            return False, [], "Supabase no conectado"
+        
+        try:
+            old_folder_name = secure_filename(f"{old_ci}_{old_nombre}")
+            new_folder_name = secure_filename(f"{new_ci}_{new_nombre}")
+            
+            if old_folder_name == new_folder_name:
+                return True, [], None  # No hay cambios
+            
+            old_prefix = f"pacientes/{old_folder_name}/"
+            new_prefix = f"pacientes/{new_folder_name}/"
+            
+            bucket = self.buckets['pdf']
+            
+            # Listar todos los archivos en la carpeta antigua
+            try:
+                files_list = self.supabase.storage.from_(bucket).list(f"pacientes/{old_folder_name}")
+            except Exception as e:
+                print(f"⚠️ No se encontró carpeta antigua o está vacía: {e}")
+                return True, [], None  # No hay archivos que mover
+            
+            if not files_list:
+                return True, [], None  # Carpeta vacía
+            
+            updated_paths = []
+            
+            for file_info in files_list:
+                if file_info.get('name'):
+                    old_path = f"{old_prefix}{file_info['name']}"
+                    new_path = f"{new_prefix}{file_info['name']}"
+                    
+                    try:
+                        # Mover archivo a nueva ubicación
+                        self.supabase.storage.from_(bucket).move(old_path, new_path)
+                        updated_paths.append({
+                            'old': old_path,
+                            'new': new_path
+                        })
+                        print(f"✓ Movido: {old_path} → {new_path}")
+                    except Exception as move_error:
+                        print(f"⚠️ Error moviendo {old_path}: {move_error}")
+            
+            print(f"✅ Carpeta renombrada: {old_folder_name} → {new_folder_name}")
+            return True, updated_paths, None
+            
+        except Exception as e:
+            error_msg = f"Error al renombrar carpeta en Supabase: {str(e)}"
+            print(f"❌ {error_msg}")
+            return False, [], error_msg

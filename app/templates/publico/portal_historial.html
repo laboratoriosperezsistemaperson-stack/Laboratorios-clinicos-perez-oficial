@@ -1,0 +1,676 @@
+{% extends "base.html" %}
+{% block title %}Mi Historial - Laboratorio Pérez{% endblock %}
+{% block content %}
+<style>
+    :root {
+        --verde-perez: #1ABC9C;
+        --verde-oscuro: #16A085;
+        --verde-claro: #2ECC71;
+        --teal-600: #0d9488;
+        --teal-700: #0f766e;
+        --teal-800: #115e59;
+    }
+
+    /* ========== FONDO PROFESIONAL ========== */
+    .historial-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0d9488 0%, #0f766e 30%, #115e59 60%, #134e4a 100%);
+        z-index: -2;
+    }
+
+    /* Partículas flotantes */
+    .particles-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .particle-dot {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: floatParticle 20s infinite ease-in-out;
+    }
+
+    .particle-dot:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        left: 5%;
+        top: 15%;
+        animation-delay: 0s;
+    }
+
+    .particle-dot:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        right: 10%;
+        top: 25%;
+        animation-delay: 3s;
+    }
+
+    .particle-dot:nth-child(3) {
+        width: 100px;
+        height: 100px;
+        left: 20%;
+        bottom: 20%;
+        animation-delay: 5s;
+    }
+
+    .particle-dot:nth-child(4) {
+        width: 50px;
+        height: 50px;
+        right: 15%;
+        bottom: 30%;
+        animation-delay: 2s;
+    }
+
+    .particle-dot:nth-child(5) {
+        width: 70px;
+        height: 70px;
+        left: 60%;
+        top: 10%;
+        animation-delay: 4s;
+    }
+
+    @keyframes floatParticle {
+
+        0%,
+        100% {
+            transform: translateY(0) scale(1);
+            opacity: 0.1;
+        }
+
+        50% {
+            transform: translateY(-40px) scale(1.1);
+            opacity: 0.2;
+        }
+    }
+
+    /* ========== CONTENEDOR PRINCIPAL ========== */
+    .historial-wrapper {
+        padding: 40px 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+        min-height: calc(100vh - 100px);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ========== TARJETA DE BIENVENIDA ========== */
+    .welcome-card {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+        margin-bottom: 30px;
+        animation: slideDown 0.5s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .welcome-header {
+        background: linear-gradient(135deg, var(--verde-perez), var(--verde-oscuro));
+        color: white;
+        padding: 35px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+        animation: rotateGlow 25s linear infinite;
+    }
+
+    @keyframes rotateGlow {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .welcome-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        flex-shrink: 0;
+    }
+
+    .welcome-text h1 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 0 5px 0;
+    }
+
+    .welcome-text p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+
+    .welcome-text .ci-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.95rem;
+        margin-top: 10px;
+    }
+
+    /* ========== SECCIÓN DE HISTORIAL ========== */
+    .historial-section {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        animation: slideUp 0.6s ease-out 0.2s backwards;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .section-header {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 25px 35px;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #2C3E50;
+        margin: 0;
+    }
+
+    .section-title i {
+        color: var(--verde-perez);
+        font-size: 1.6rem;
+    }
+
+    .results-count {
+        background: var(--verde-perez);
+        color: white;
+        padding: 8px 18px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    /* ========== TIMELINE DE RESULTADOS ========== */
+    .results-timeline {
+        padding: 30px 35px;
+    }
+
+    .result-item {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin-bottom: 20px;
+        border-left: 5px solid var(--verde-perez);
+        transition: all 0.3s ease;
+        animation: fadeInLeft 0.5s ease-out backwards;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .result-item:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .result-item:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .result-item:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .result-item:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .result-item:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .result-item:hover {
+        transform: translateX(10px) scale(1.01);
+        box-shadow: 0 15px 40px rgba(26, 188, 156, 0.15);
+        border-left-width: 8px;
+    }
+
+    .result-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(26, 188, 156, 0.03));
+        pointer-events: none;
+    }
+
+    .result-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .result-date {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .date-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--verde-perez), var(--verde-oscuro));
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.4rem;
+    }
+
+    .date-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .date-text .day {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #2C3E50;
+        line-height: 1;
+    }
+
+    .date-text .month-year {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .result-order {
+        background: #e9ecef;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: #495057;
+    }
+
+    .result-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #495057;
+    }
+
+    .detail-item i {
+        color: var(--verde-perez);
+        font-size: 1.1rem;
+        width: 24px;
+    }
+
+    .detail-item span {
+        font-size: 0.95rem;
+    }
+
+    .detail-item strong {
+        color: #2C3E50;
+    }
+
+    /* ========== BOTÓN DE DESCARGA ========== */
+    .download-section {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-download-report {
+        background: linear-gradient(135deg, #E74C3C, #C0392B);
+        color: white;
+        padding: 14px 28px;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(231, 76, 60, 0.35);
+    }
+
+    .btn-download-report:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 12px 35px rgba(231, 76, 60, 0.45);
+        color: white;
+    }
+
+    .btn-download-report i {
+        font-size: 1.2rem;
+    }
+
+    /* ========== MENSAJE SIN RESULTADOS ========== */
+    .no-results {
+        text-align: center;
+        padding: 60px 30px;
+    }
+
+    .no-results-icon {
+        font-size: 5rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .no-results h3 {
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .no-results p {
+        color: #adb5bd;
+    }
+
+    /* ========== BOTÓN CERRAR SESIÓN ========== */
+    .logout-section {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .btn-logout {
+        background: white;
+        color: var(--verde-perez);
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        border: 3px solid var(--verde-perez);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-logout:hover {
+        background: var(--verde-perez);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(26, 188, 156, 0.3);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+        .historial-wrapper {
+            padding: 20px 15px;
+        }
+
+        .welcome-header {
+            padding: 25px 20px;
+        }
+
+        .welcome-content {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .welcome-text h1 {
+            font-size: 1.4rem;
+        }
+
+        .avatar-circle {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+
+        .section-header {
+            padding: 20px;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .results-timeline {
+            padding: 20px 15px;
+        }
+
+        .result-item {
+            padding: 20px;
+        }
+
+        .result-header {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .download-section {
+            justify-content: center;
+        }
+
+        .btn-download-report {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<script>
+    // Meses en español para JavaScript
+    const mesesEspanol = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+</script>
+
+<!-- Fondo animado -->
+<div class="historial-background"></div>
+<div class="particles-bg">
+    <div class="particle-dot"></div>
+    <div class="particle-dot"></div>
+    <div class="particle-dot"></div>
+    <div class="particle-dot"></div>
+    <div class="particle-dot"></div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div class="historial-wrapper">
+
+    <!-- Tarjeta de Bienvenida -->
+    <div class="welcome-card">
+        <div class="welcome-header">
+            <div class="welcome-content">
+                <div class="avatar-circle">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="welcome-text">
+                    <h1>👋 Hola, {{ paciente.nombre if paciente.nombre is string else paciente['nombre'] }}</h1>
+                    <p>Bienvenido a tu portal de resultados</p>
+                    <div class="ci-badge">
+                        <i class="fas fa-id-card"></i>
+                        CI: {{ paciente.ci if paciente.ci is string else paciente['ci'] }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Historial -->
+    <div class="historial-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-clipboard-list"></i>
+                Tu Historial de Resultados
+            </h2>
+            <span class="results-count">
+                <i class="fas fa-file-medical"></i>
+                {{ resultados|length }} resultado{% if resultados|length != 1 %}s{% endif %}
+            </span>
+        </div>
+
+        <div class="results-timeline">
+            {% if resultados %}
+            {% for resultado in resultados %}
+            <div class="result-item">
+                <div class="result-header">
+                    <div class="result-date">
+                        <div class="date-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="date-text">
+                            {% if resultado.fecha_muestra %}
+                            {% set meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV',
+                            'DIC'] %}
+                            <span class="day">{{ resultado.fecha_muestra.strftime('%d') }}</span>
+                            <span class="month-year">{{ meses[resultado.fecha_muestra.month - 1] }} {{
+                                resultado.fecha_muestra.strftime('%Y') }}</span>
+                            {% else %}
+                            <span class="day">--</span>
+                            <span class="month-year">Sin fecha</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="result-order">
+                        <i class="fas fa-hashtag"></i> {{ resultado.numero_orden }}
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    {% if resultado.prueba %}
+                    <div class="detail-item">
+                        <i class="fas fa-microscope"></i>
+                        <span><strong>Informe:</strong> {{ resultado.prueba.nombre }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="detail-item">
+                        <i class="fas fa-clock"></i>
+                        <span><strong>Registrado:</strong> {{ resultado.fecha_creacion.strftime('%d/%m/%Y') if
+                            resultado.fecha_creacion else '-' }}</span>
+                    </div>
+                </div>
+
+                <div class="download-section">
+                    {% if resultado.archivo_pdf %}
+                    <a href="{{ url_for('main.descargar_resultado_publico', resultado_id=resultado.id) }}"
+                        class="btn-download-report" target="_blank">
+                        <i class="fas fa-file-pdf"></i>
+                        DESCARGAR INFORME DE RESULTADO
+                    </a>
+                    {% else %}
+                    <span class="text-muted">
+                        <i class="fas fa-exclamation-circle"></i> PDF no disponible
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3>No tienes resultados aún</h3>
+                <p>Cuando te realices un estudio, tus resultados aparecerán aquí.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botón Cerrar Sesión -->
+    <div class="logout-section">
+        <a href="{{ url_for('main.portal_resultados') }}" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i>
+            Cerrar Sesión
+        </a>
+    </div>
+
+</div>
+{% endblock %}

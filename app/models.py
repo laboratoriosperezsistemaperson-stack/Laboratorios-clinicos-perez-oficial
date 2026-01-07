@@ -40,7 +40,7 @@ class Resultado(db.Model):
     paciente_ci = db.Column(db.String(20), nullable=False)
     fecha_muestra = db.Column(db.Date)
     archivo_pdf = db.Column(db.String(200))
-    codigo_acceso = db.Column(db.String(20), unique=True)  # Código de acceso debe ser único
+    codigo_acceso = db.Column(db.String(20), nullable=True)  # Deprecado - ya no se usa, acceso solo con CI
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relación con Prueba (Nuevo campo para Tipo de Laboratorio)

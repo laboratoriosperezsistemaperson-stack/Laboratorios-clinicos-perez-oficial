@@ -302,9 +302,7 @@
         max-width: 120px;
     }
 
-    .col-codigo {
-        min-width: 100px;
-    }
+
 
     .col-prueba {
         min-width: 150px;
@@ -476,6 +474,61 @@
         z-index: 10070 !important;
         background-color: #fff !important;
     }
+
+    /* ========== BUSCADOR DE PRUEBAS ========== */
+    .searchable-select-wrapper {
+        position: relative;
+    }
+
+    .search-input-container {
+        position: relative;
+    }
+
+    .search-input-container .search-icon-inline {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #F39C12;
+        z-index: 2;
+    }
+
+    .search-pruebas-input {
+        padding-left: 38px !important;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .search-pruebas-input:focus {
+        border-color: #F39C12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+    }
+
+    .searchable-select-wrapper select {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .searchable-select-wrapper select:focus {
+        border-color: #F39C12;
+        box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.15);
+    }
+
+    .searchable-select-wrapper select option {
+        padding: 8px 12px;
+    }
+
+    .searchable-select-wrapper select option:checked {
+        background: linear-gradient(135deg, #F39C12, #E67E22);
+        color: white;
+    }
+
+    .no-results-option {
+        color: #6c757d;
+        font-style: italic;
+    }
 </style>
 
 <div class="content-wrapper" style="padding: 30px;">
@@ -569,12 +622,10 @@
                                     <th class="col-numero-orden"><i class="fas fa-hashtag"></i> Nº Orden</th>
                                     <th class="col-paciente"><i class="fas fa-user"></i> Paciente</th>
                                     <th class="col-ci"><i class="fas fa-id-card"></i> CI</th>
-                                    <th class="col-codigo"><i class="fas fa-key"></i> Código</th>
-                                    <th class="col-prueba"><i class="fas fa-vial"></i> Tipo Laboratorio</th>
+                                    <th class="col-prueba"><i class="fas fa-file-medical"></i> Informe</th>
                                     <th class="col-fecha"><i class="fas fa-calendar"></i> Fecha</th>
                                     <th class="col-archivo"><i class="fas fa-file"></i> PDF</th>
                                     <th class="col-acciones"><i class="fas fa-cogs"></i> Acciones</th>
-                                    <th class="text-center"><i class="fas fa-id-badge"></i> Credenciales</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados">
@@ -588,9 +639,6 @@
                                     </td>
                                     <td class="col-ci" title="{{ r.paciente_ci }}">
                                         {{ r.paciente_ci }}
-                                    </td>
-                                    <td class="col-codigo">
-                                        <span class="badge bg-info">{{ r.codigo_acceso }}</span>
                                     </td>
                                     <td class="col-prueba">
                                         <span class="badge bg-secondary"
@@ -628,24 +676,10 @@
                                             </button>
                                         </div>
                                     </td>
-                                    <td class="text-center">
-                                        <div class="btn-group-modern">
-                                            <a href="{{ url_for('main.descargar_credenciales_pdf', resultado_id=r.id) }}"
-                                                class="btn-modern btn-pdf btn-sm-modern"
-                                                title="Descargar credenciales PDF">
-                                                <i class="fas fa-file-pdf"></i>
-                                            </a>
-                                            <a href="{{ url_for('main.descargar_credenciales_word', resultado_id=r.id) }}"
-                                                class="btn-modern btn-word btn-sm-modern"
-                                                title="Descargar credenciales Word">
-                                                <i class="fas fa-file-word"></i>
-                                            </a>
-                                        </div>
-                                    </td>
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="9">
+                                    <td colspan="7">
                                         <div class="empty-state-modern">
                                             <i class="fas fa-file-medical-alt"></i>
                                             <p>No hay resultados registrados</p>
@@ -696,7 +730,6 @@
                                     <th class="col-numero-orden"><i class="fas fa-hashtag"></i> Nº Orden</th>
                                     <th class="col-paciente"><i class="fas fa-user"></i> Paciente</th>
                                     <th class="col-ci"><i class="fas fa-id-card"></i> CI</th>
-                                    <th class="col-codigo"><i class="fas fa-key"></i> Código</th>
                                     <th class="col-fecha"><i class="fas fa-calendar-times"></i> Fecha Eliminación</th>
                                     <th><i class="fas fa-user-shield"></i> Eliminado por</th>
                                     <th class="col-acciones text-center"><i class="fas fa-cogs"></i> Acciones</th>
@@ -715,10 +748,6 @@
                                     </td>
                                     <td class="col-ci" title="{{ r.paciente_ci }}">
                                         {{ r.paciente_ci }}
-                                    </td>
-                                    <td class="col-codigo">
-                                        <span class="badge bg-secondary" style="opacity: 0.7;">{{ r.codigo_acceso
-                                            }}</span>
                                     </td>
                                     <td class="col-fecha">
                                         {{ r.fecha_eliminacion.strftime('%d/%m/%Y %H:%M') if r.fecha_eliminacion else
@@ -748,7 +777,7 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="6">
                                         <div class="empty-state-modern" style="padding: 40px;">
                                             <i class="fas fa-recycle" style="color: #27AE60;"></i>
                                             <p style="color: #27AE60;">¡La papelera está vacía!</p>
@@ -802,16 +831,25 @@
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label"><i class="fas fa-vial"></i> Tipo de Laboratorio / Prueba <span
+                        <label class="form-label"><i class="fas fa-file-medical"></i> Informe de Laboratorio <span
                                 class="text-danger">*</span></label>
-                        <select class="form-select" name="prueba_id" required>
-                            <option value="">-- Seleccione el Tipo de Laboratorio --</option>
-                            {% for prueba in pruebas %}
-                            <option value="{{ prueba.id }}">{{ prueba.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                        <small class="text-muted">Seleccione el análisis correspondiente (ej. Hemograma, Orina,
-                            etc)</small>
+                        <!-- Dropdown con búsqueda para pruebas -->
+                        <div class="searchable-select-wrapper">
+                            <div class="search-input-container mb-2">
+                                <i class="fas fa-search search-icon-inline"></i>
+                                <input type="text" class="form-control search-pruebas-input" id="searchPruebasInput"
+                                    placeholder="Buscar informe... (ej: hemograma, orina)" autocomplete="off">
+                            </div>
+                            <select class="form-select" name="prueba_id" id="selectPrueba" required size="6"
+                                style="height: auto;">
+                                <option value="">-- Seleccione el Informe de Laboratorio --</option>
+                                {% for prueba in pruebas %}
+                                <option value="{{ prueba.id }}">{{ prueba.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <small class="text-muted"><i class="fas fa-lightbulb text-warning"></i> Escriba para buscar o
+                            use el scroll para ver todas las opciones</small>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label"><i class="fas fa-user"></i> Nombre</label>
@@ -917,6 +955,52 @@
             modalNuevo.show();
         }, 300);
     }
+
+    // ========== BUSCADOR DE PRUEBAS ==========
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchPruebasInput');
+        const selectPrueba = document.getElementById('selectPrueba');
+
+        if (searchInput && selectPrueba) {
+            // Guardar todas las opciones originales
+            const allOptions = Array.from(selectPrueba.options);
+
+            searchInput.addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+
+                // Limpiar select
+                selectPrueba.innerHTML = '';
+
+                // Filtrar y agregar opciones que coincidan
+                let matchCount = 0;
+                allOptions.forEach(option => {
+                    const optionText = option.text.toLowerCase();
+                    if (option.value === '' || optionText.includes(searchTerm)) {
+                        selectPrueba.appendChild(option.cloneNode(true));
+                        if (option.value !== '') matchCount++;
+                    }
+                });
+
+                // Si no hay resultados, mostrar mensaje
+                if (matchCount === 0 && searchTerm !== '') {
+                    const noResultOption = document.createElement('option');
+                    noResultOption.text = '❌ No se encontraron pruebas con ese nombre';
+                    noResultOption.disabled = true;
+                    noResultOption.className = 'no-results-option';
+                    selectPrueba.appendChild(noResultOption);
+                }
+            });
+
+            // Limpiar búsqueda cuando se abre el modal
+            document.getElementById('modalNuevo')?.addEventListener('show.bs.modal', function () {
+                searchInput.value = '';
+                selectPrueba.innerHTML = '';
+                allOptions.forEach(option => {
+                    selectPrueba.appendChild(option.cloneNode(true));
+                });
+            });
+        }
+    });
 </script>
 
 <!-- Modal de confirmación después de subir PDF -->
@@ -1050,7 +1134,6 @@
                         <li>El registro del resultado en la base de datos</li>
                         <li>El archivo PDF principal</li>
                         <li>El archivo PDF de backup</li>
-                        <li>El código de acceso del paciente</li>
                     </ul>
                 </div>
                 <div class="modal-footer" style="border-top: none; padding: 20px 30px;">

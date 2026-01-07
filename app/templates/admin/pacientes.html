@@ -346,6 +346,31 @@
     .modal-dialog {
         margin-top: 100px !important;
     }
+
+    /* WhatsApp Link */
+    .whatsapp-link {
+        color: #25D366;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: rgba(37, 211, 102, 0.1);
+    }
+
+    .whatsapp-link:hover {
+        background: #25D366;
+        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    }
+
+    .whatsapp-link i {
+        font-size: 1.1rem;
+    }
 </style>
 {% endblock %}
 
@@ -403,7 +428,16 @@
                             <td><span class="id-badge">{{ p.id }}</span></td>
                             <td><strong>{{ p.nombre }}</strong></td>
                             <td>{{ p.ci }}</td>
-                            <td>{{ p.telefono or '-' }}</td>
+                            <td>
+                                {% if p.telefono %}
+                                <a href="https://wa.me/591{{ p.telefono|replace(' ', '')|replace('-', '') }}"
+                                    target="_blank" class="whatsapp-link" title="Abrir WhatsApp con {{ p.nombre }}">
+                                    <i class="fab fa-whatsapp"></i> {{ p.telefono }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
                             <td>{{ p.email or '-' }}</td>
                             <td>{{ p.fecha_registro.strftime('%d/%m/%Y') }}</td>
                             <td class="text-center">
@@ -439,12 +473,12 @@
     </div>
 </div>
 <script>
-document.getElementById('searchPacientes')?.addEventListener('keyup', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    document.querySelectorAll('#tablaPacientes tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
+    document.getElementById('searchPacientes')?.addEventListener('keyup', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('#tablaPacientes tr').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
+        });
     });
-});
 </script>
 <div class="modal fade" id="modalNuevo" tabindex="-1">
     <div class="modal-dialog">
@@ -459,10 +493,12 @@ document.getElementById('searchPacientes')?.addEventListener('keyup', function(e
                             Completo</label><input type="text" class="form-control" name="nombre" required></div>
                     <div class="mb-3"><label class="form-label"><i class="fas fa-id-card"></i> CI</label><input
                             type="text" class="form-control" name="ci" required></div>
-                    <div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Telefono</label><input
-                            type="text" class="form-control" name="telefono"></div>
-                    <div class="mb-3"><label class="form-label"><i class="fas fa-envelope"></i> Email</label><input
-                            type="email" class="form-control" name="email"></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Teléfono <small
+                                class="text-muted">(Opcional)</small></label><input type="text" class="form-control"
+                            name="telefono" placeholder="Ej: 72445566"></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-envelope"></i> Email <small
+                                class="text-muted">(Opcional)</small></label><input type="email" class="form-control"
+                            name="email" placeholder="Ej: nombre@email.com"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
@@ -531,10 +567,12 @@ document.getElementById('searchPacientes')?.addEventListener('keyup', function(e
                             required></div>
                     <div class="mb-3"><label class="form-label"><i class="fas fa-id-card"></i> CI</label><input
                             type="text" class="form-control" name="ci" id="editCI" required></div>
-                    <div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Telefono</label><input
-                            type="text" class="form-control" name="telefono" id="editTelefono"></div>
-                    <div class="mb-3"><label class="form-label"><i class="fas fa-envelope"></i> Email</label><input
-                            type="email" class="form-control" name="email" id="editEmail"></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Teléfono <small
+                                class="text-muted">(Opcional)</small></label><input type="text" class="form-control"
+                            name="telefono" id="editTelefono"></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-envelope"></i> Email <small
+                                class="text-muted">(Opcional)</small></label><input type="email" class="form-control"
+                            name="email" id="editEmail"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i>
@@ -555,7 +593,8 @@ document.getElementById('searchPacientes')?.addEventListener('keyup', function(e
             <form method="POST" id="formEliminar">
                 <div class="modal-body">
                     <div class="alert alert-danger mb-3"><i class="fas fa-exclamation-circle"></i>
-                        <strong>ADVERTENCIA!</strong><br>Esta accion es <strong>IRREVERSIBLE</strong> y eliminara:</div>
+                        <strong>ADVERTENCIA!</strong><br>Esta accion es <strong>IRREVERSIBLE</strong> y eliminara:
+                    </div>
                     <ul class="mb-3">
                         <li><i class="fas fa-user text-danger"></i> El paciente: <strong id="eliminarNombre"></strong>
                         </li>

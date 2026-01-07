@@ -60,6 +60,7 @@
             opacity: 0;
             transform: translateY(30px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -103,6 +104,7 @@
         padding: 14px 18px;
         border: 2px solid #e0e0e0;
     }
+
     .form-control-lg:focus {
         border-color: var(--color-verde);
         box-shadow: 0 0 0 0.2rem rgba(26, 188, 156, 0.25);
@@ -137,33 +139,33 @@
         <div class="consulta-card-body">
 
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% endwith %}
 
             <form method="POST" action="{{ url_for('main.consultar_resultado') }}">
                 <div class="mb-4">
                     <label class="form-label"><i class="fas fa-id-card"></i> Cédula de Identidad (CI)</label>
-                    <input type="text" class="form-control form-control-lg" name="ci" required placeholder="Ingrese su CI">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label"><i class="fas fa-key"></i> Código de Acceso</label>
-                    <input type="text" class="form-control form-control-lg" name="codigo" required placeholder="Ingrese su código" style="text-transform: uppercase;">
+                    <input type="text" class="form-control form-control-lg" name="ci" required
+                        placeholder="Ingrese su número de CI" autocomplete="off">
+                    <small class="text-muted mt-2 d-block">
+                        <i class="fas fa-info-circle"></i> Solo necesita su CI para ver su historial completo
+                    </small>
                 </div>
                 <button type="submit" class="btn btn-primary btn-consultar w-100">
-                    <i class="fas fa-search"></i> Consultar Resultado
+                    <i class="fas fa-search"></i> Ver Mi Historial
                 </button>
             </form>
 
             <div class="alert alert-info mt-4">
-                <i class="fas fa-info-circle"></i> <strong>¿No tienes tus credenciales?</strong><br>
-                Solicítalas en el laboratorio o revisa el documento que te entregamos.
+                <i class="fas fa-shield-alt"></i> <strong>Acceso Seguro</strong><br>
+                Sus resultados están protegidos y solo usted puede acceder con su CI.
             </div>
         </div>
 

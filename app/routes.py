@@ -362,25 +362,38 @@ def catalogo_pruebas():
 @main.route('/consultar-resultado', methods=['POST'])
 def consultar_resultado():
     """
-    Consulta pública de resultados para pacientes.
-    - Solo busca resultados ACTIVOS (no eliminados)
-    - Funciona indefinidamente mientras el resultado no sea eliminado permanentemente
+    REQ-02: Login simplificado solo con CI
+    Busca el paciente por CI y muestra su historial completo
     """
-    ci = request.form.get('ci')
-    codigo = request.form.get('codigo')
-
-    # Solo buscar en resultados NO eliminados
-    resultado = Resultado.query.filter_by(
-        paciente_ci=ci, 
-        codigo_acceso=codigo,
-        eliminado=False
-    ).first()
-
-    if resultado:
-        return render_template('publico/ver_resultado.html', resultado=resultado)
-    else:
-        flash('CI o código de acceso incorrecto', 'danger')
+    ci = request.form.get('ci', '').strip()
+    
+    if not ci:
+        flash('Por favor ingrese su Cédula de Identidad', 'danger')
         return redirect(url_for('main.portal_resultados'))
+    
+    # Buscar paciente por CI
+    paciente = Paciente.query.filter_by(ci=ci).first()
+    
+    if not paciente:
+        # Intentar buscar en resultados directamente (para datos legacy)
+        resultado = Resultado.query.filter_by(paciente_ci=ci, eliminado=False).first()
+        if resultado:
+            # Crear objeto paciente temporal para la vista
+            return render_template('publico/portal_historial.html', 
+                                  paciente={'nombre': resultado.paciente_nombre, 'ci': ci},
+                                  resultados=[resultado])
+        flash('No se encontró ningún paciente con ese CI', 'danger')
+        return redirect(url_for('main.portal_resultados'))
+    
+    # Obtener TODOS los resultados del paciente (no eliminados)
+    resultados = Resultado.query.filter_by(
+        paciente_ci=ci,
+        eliminado=False
+    ).order_by(Resultado.fecha_muestra.desc()).all()
+    
+    return render_template('publico/portal_historial.html', 
+                          paciente=paciente, 
+                          resultados=resultados)
 
 @main.route('/dashboard')
 @admin_required
@@ -543,7 +556,8 @@ def admin_pacientes():
         except Exception as e:
             flash(f'Error: {str(e)}', 'danger')
         return redirect(url_for('main.admin_pacientes'))
-    pacientes = Paciente.query.order_by(Paciente.fecha_registro.desc()).all()
+    # Ordenar alfabéticamente por nombre para evitar duplicidades visuales
+    pacientes = Paciente.query.order_by(Paciente.nombre.asc()).all()
     return render_template('admin/pacientes.html', pacientes=pacientes, now=datetime.now())
 
 @main.route('/paciente/<int:paciente_id>')
@@ -572,32 +586,32 @@ def editar_paciente(paciente_id):
         paciente.telefono = request.form.get('telefono')
         paciente.email = request.form.get('email')
 
-        # Si cambió nombre o CI, intentar renombrar carpeta
+        # Si cambió nombre o CI, renombrar carpeta en Supabase
         if old_ci != paciente.ci or old_nombre != paciente.nombre:
-             try:
-                 old_folder_name = secure_filename(f"{old_ci}_{old_nombre}")
-                 new_folder_name = secure_filename(f"{paciente.ci}_{paciente.nombre}")
-                 
-                 old_path = os.path.join(UPLOAD_DIR, 'pacientes', old_folder_name)
-                 new_path = os.path.join(UPLOAD_DIR, 'pacientes', new_folder_name)
-                 
-                 if os.path.exists(old_path):
-                     os.rename(old_path, new_path)
-                     print(f"Renombrado: {old_folder_name} -> {new_folder_name}")
-                     
-                     # Actualizar paths en BD para resultados de este paciente?
-                     # No es estrictamente necesario si usamos ruta relativa dinámica "pacientes/{ci}_{nombre}",
-                     # pero si guardamos la ruta completa relativa "pacientes/old/file.pdf", entonces sí.
-                     # Verifiquemos cómo guardamos: relative_path = os.path.join('pacientes', nombre_carpeta, filename)
-                     # SÍ, guardamos la ruta con el nombre de carpeta. HAY QUE ACTUALIZAR BD.
-                     
-                     resultados_p = Resultado.query.filter_by(paciente_id=paciente_id).all()
-                     for res in resultados_p:
-                         if res.archivo_pdf and old_folder_name in res.archivo_pdf:
-                             res.archivo_pdf = res.archivo_pdf.replace(old_folder_name, new_folder_name)
-                             
-             except Exception as e:
-                 print(f"Error renombrando carpeta: {e}")
+            try:
+                # Renombrar carpeta en Supabase Storage
+                success, updated_paths, error = pdf_manager.rename_patient_folder(
+                    old_ci, old_nombre, 
+                    paciente.ci, paciente.nombre
+                )
+                
+                if success and updated_paths:
+                    # Actualizar paths en la BD para resultados de este paciente
+                    from werkzeug.utils import secure_filename
+                    old_folder_name = secure_filename(f"{old_ci}_{old_nombre}")
+                    new_folder_name = secure_filename(f"{paciente.ci}_{paciente.nombre}")
+                    
+                    resultados_p = Resultado.query.filter_by(paciente_id=paciente_id).all()
+                    for res in resultados_p:
+                        if res.archivo_pdf and old_folder_name in res.archivo_pdf:
+                            res.archivo_pdf = res.archivo_pdf.replace(old_folder_name, new_folder_name)
+                    
+                    print(f"✅ Carpeta y {len(updated_paths)} archivos actualizados en Supabase")
+                elif error:
+                    print(f"⚠️ {error}")
+                    
+            except Exception as e:
+                print(f"⚠️ Error renombrando carpeta en Supabase: {e}")
 
         resultados = Resultado.query.filter_by(paciente_id=paciente_id).all()
         for resultado in resultados:
@@ -706,10 +720,8 @@ def admin_resultados():
             fecha_str = request.form.get('fecha_muestra')
             fecha_muestra = datetime.strptime(fecha_str, '%Y-%m-%d').date() if fecha_str else None
 
-            # ============ GENERAR CÓDIGO DE ACCESO ÚNICO ============
-            codigo_acceso = generar_codigo_acceso()
-
             # ============ REGISTRAR EN BASE DE DATOS ============
+            # Ya no se usa código de acceso - login simplificado solo con CI
             resultado = Resultado(
                 numero_orden=numero_orden_generado,
                 paciente_id=paciente.id,
@@ -717,7 +729,7 @@ def admin_resultados():
                 paciente_ci=paciente.ci,
                 fecha_muestra=fecha_muestra,
                 archivo_pdf=filename_guardado,
-                codigo_acceso=codigo_acceso,
+                codigo_acceso=None,  # Ya no se usa - acceso solo con CI
                 prueba_id=request.form.get('prueba_id') or None
             )
 
@@ -729,13 +741,12 @@ def admin_resultados():
             print("✅ RESULTADO GUARDADO EXITOSAMENTE")
             print(f"   ID: {resultado.id}")
             print(f"   Número Orden: {numero_orden_generado}")
-            print(f"   Código Acceso: {codigo_acceso}")
-            print(f"   Paciente: {paciente.nombre}")
+            print(f"   Paciente: {paciente.nombre} (CI: {paciente.ci})")
             print(f"   Archivo: {filename_guardado}")
             print(f"   Backup: ✓ Creado")
             print("=" * 80)
 
-            flash(f'✅ Resultado guardado exitosamente. Código de acceso: {codigo_acceso}', 'success')
+            flash(f'✅ Resultado guardado exitosamente para {paciente.nombre}', 'success')
 
         except ValueError as ve:
             # Errores de validación (archivo no válido, etc.)
