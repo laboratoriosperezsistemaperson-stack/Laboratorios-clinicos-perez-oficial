@@ -531,11 +531,30 @@ def dashboard():
 def admin_pacientes():
     if request.method == 'POST':
         try:
+            ci = request.form['ci'].strip()
+            nombre = request.form['nombre'].strip()
+            
+            # Validar que CI no esté vacío
+            if not ci:
+                flash('❌ El CI es obligatorio', 'danger')
+                return redirect(url_for('main.admin_pacientes'))
+            
+            # Validar que nombre no esté vacío
+            if not nombre:
+                flash('❌ El nombre es obligatorio', 'danger')
+                return redirect(url_for('main.admin_pacientes'))
+            
+            # Verificar si ya existe un paciente con ese CI
+            paciente_existente = Paciente.query.filter_by(ci=ci).first()
+            if paciente_existente:
+                flash(f'⚠️ Ya existe un paciente con CI {ci}: {paciente_existente.nombre}. No se permiten duplicados.', 'warning')
+                return redirect(url_for('main.admin_pacientes'))
+            
             paciente = Paciente(
-                nombre=request.form['nombre'],
-                ci=request.form['ci'],
-                telefono=request.form.get('telefono'),
-                email=request.form.get('email')
+                nombre=nombre,
+                ci=ci,
+                telefono=request.form.get('telefono', '').strip() or None,
+                email=request.form.get('email', '').strip() or None
             )
             db.session.add(paciente)
             db.session.commit()
@@ -550,11 +569,12 @@ def admin_pacientes():
             except Exception as e:
                 print(f"⚠ Error creando carpeta: {e}")
                 
-            flash('Paciente registrado exitosamente', 'success')
+            flash(f'✅ Paciente {nombre} registrado exitosamente', 'success')
             # Redirigir con parámetros para mostrar modal de éxito
             return redirect(url_for('main.admin_pacientes', nuevo_exito=1, paciente_nombre=paciente.nombre))
         except Exception as e:
-            flash(f'Error: {str(e)}', 'danger')
+            db.session.rollback()
+            flash(f'❌ Error al registrar paciente: {str(e)}', 'danger')
         return redirect(url_for('main.admin_pacientes'))
     # Ordenar alfabéticamente por nombre para evitar duplicidades visuales
     pacientes = Paciente.query.order_by(Paciente.nombre.asc()).all()
