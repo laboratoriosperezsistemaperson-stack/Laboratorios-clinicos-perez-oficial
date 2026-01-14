@@ -1436,16 +1436,25 @@ def nueva_publicacion():
             categoria=categoria
         )
         
-        # Manejar imagen si se subió
-        # Manejar imagen si se subió
-        if 'imagen' in request.files:
-            file = request.files['imagen']
+        # Manejar archivo multimedia (imagen o video)
+        if 'media' in request.files:
+            file = request.files['media']
             if file and file.filename:
-                # Subir a Supabase (Bucket imagenes, carpeta social)
-                success, storage_path, error = file_manager.save_image(file, 'social')
-                if success:
-                    public_url = file_manager.get_public_url(storage_path, 'img')
-                    nueva.imagen = public_url
+                ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+                video_extensions = {'mp4', 'webm', 'mov'}
+                
+                if ext in video_extensions:
+                    # Es un video
+                    success, storage_path, error = file_manager.save_video(file, 'social')
+                    if success:
+                        public_url = file_manager.get_public_url(storage_path, 'img')
+                        nueva.video = public_url
+                else:
+                    # Es una imagen
+                    success, storage_path, error = file_manager.save_image(file, 'social')
+                    if success:
+                        public_url = file_manager.get_public_url(storage_path, 'img')
+                        nueva.imagen = public_url
         
         db.session.add(nueva)
         db.session.commit()
@@ -1469,16 +1478,27 @@ def editar_publicacion(id):
         pub.categoria = request.form.get('categoria', pub.categoria)
         pub.activo = 'activo' in request.form
         
-        # Manejar nueva imagen si se subió
-        # Manejar nueva imagen si se subió
-        if 'imagen' in request.files:
-            file = request.files['imagen']
+        # Manejar nuevo archivo multimedia si se subió
+        if 'media' in request.files:
+            file = request.files['media']
             if file and file.filename:
-                # Subir a Supabase
-                success, storage_path, error = file_manager.save_image(file, 'social')
-                if success:
-                    public_url = file_manager.get_public_url(storage_path, 'img')
-                    pub.imagen = public_url
+                ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+                video_extensions = {'mp4', 'webm', 'mov'}
+                
+                if ext in video_extensions:
+                    # Es un video
+                    success, storage_path, error = file_manager.save_video(file, 'social')
+                    if success:
+                        public_url = file_manager.get_public_url(storage_path, 'img')
+                        pub.video = public_url
+                        pub.imagen = None  # Limpiar imagen si se sube video
+                else:
+                    # Es una imagen
+                    success, storage_path, error = file_manager.save_image(file, 'social')
+                    if success:
+                        public_url = file_manager.get_public_url(storage_path, 'img')
+                        pub.imagen = public_url
+                        pub.video = None  # Limpiar video si se sube imagen
         
         db.session.commit()
         flash('✅ Publicación actualizada', 'success')

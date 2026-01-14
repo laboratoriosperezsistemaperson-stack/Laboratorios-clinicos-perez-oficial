@@ -103,6 +103,47 @@ class FileManager:
         except Exception as e:
             return False, None, f"Error al guardar imagen en Supabase: {str(e)}"
 
+    def save_video(self, file, folder_path):
+        """
+        Sube un video a Supabase Storage (Bucket: imagenes).
+        Extensions: mp4, webm, mov
+        folder_path: 'social', 'videos', etc.
+        """
+        if not file or file.filename == '':
+            return False, None, "No se seleccionó ningún archivo"
+        
+        ALLOWED_EXTENSIONS = {'mp4', 'webm', 'mov'}
+        if not self.allowed_file(file.filename, ALLOWED_EXTENSIONS):
+            return False, None, "Formato de video no permitido (solo MP4, WebM, MOV)"
+
+        if not self.supabase:
+            return False, None, "Error de configuración: Supabase no conectado"
+
+        try:
+            ext = file.filename.rsplit('.', 1)[1].lower()
+            filename = self.generate_filename("vid", file.filename) + f".{ext}"
+            storage_path = f"{folder_path}/{filename}"
+            
+            # MIME types para videos
+            mime_types = {
+                'mp4': 'video/mp4',
+                'webm': 'video/webm',
+                'mov': 'video/quicktime'
+            }
+            mime_type = mime_types.get(ext, 'video/mp4')
+            
+            file_content = file.read()
+            self.supabase.storage.from_(self.buckets['img']).upload(
+                path=storage_path,
+                file=file_content,
+                file_options={"content-type": mime_type}
+            )
+            file.seek(0)
+            
+            return True, storage_path, None
+        except Exception as e:
+            return False, None, f"Error al guardar video en Supabase: {str(e)}"
+
     def get_public_url(self, storage_path, bucket_type='pdf'):
         """Obtiene la URL pública del archivo. bucket_type: 'pdf' o 'img'"""
         if not self.supabase or not storage_path:

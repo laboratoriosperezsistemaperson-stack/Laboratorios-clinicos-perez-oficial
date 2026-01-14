@@ -75,6 +75,7 @@ class Publicacion(db.Model):
     titulo = db.Column(db.String(200), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
     imagen = db.Column(db.String(300))  # Ruta de la imagen
+    video = db.Column(db.String(300))   # Ruta del video (MP4, WebM, MOV)
     icono = db.Column(db.String(50), default='fa-microscope')  # Icono FontAwesome
     categoria = db.Column(db.String(100), default='General')
     activo = db.Column(db.Boolean, default=True)

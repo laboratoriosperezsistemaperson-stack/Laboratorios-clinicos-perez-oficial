@@ -406,7 +406,12 @@
             <div class="fb-post-title"><i class="fas {{ pub.icono }}"></i> {{ pub.titulo }}</div>
             <p class="fb-post-text">{{ pub.contenido }}</p>
         </div>
-        {% if pub.imagen %}
+        {% if pub.video %}
+        <video controls class="fb-post-image" style="max-height: 450px; width: 100%;">
+            <source src="{{ pub.video | resolve_image_url }}" type="video/mp4">
+            Tu navegador no soporta videos.
+        </video>
+        {% elif pub.imagen %}
         <img src="{{ pub.imagen | resolve_image_url }}" alt="{{ pub.titulo }}" class="fb-post-image">
         {% endif %}
         <div class="fb-post-share">
