@@ -40,6 +40,22 @@ def create_app():
     # with app.app_context():
     #     db.create_all()
 
+    # ============ MIGRACIONES AUTOMÁTICAS ============
+    # Agregar columnas nuevas si no existen (compatibilidad con producción)
+    with app.app_context():
+        try:
+            from sqlalchemy import text
+            # Migración: Agregar columna video a publicaciones
+            db.session.execute(text('''
+                ALTER TABLE publicaciones 
+                ADD COLUMN IF NOT EXISTS video VARCHAR(300)
+            '''))
+            db.session.commit()
+            app.logger.info('✅ Migraciones ejecutadas correctamente')
+        except Exception as e:
+            db.session.rollback()
+            app.logger.warning(f'⚠️ Migración omitida o ya aplicada: {e}')
+
     # ============ MANEJO DE ERRORES PARA RENDER ============
 
     @app.errorhandler(OperationalError)
