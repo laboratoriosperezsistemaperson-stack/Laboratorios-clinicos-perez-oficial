@@ -348,6 +348,185 @@
             gap: 8px;
         }
     }
+
+    /* ============ SECCIÓN SOBRE LAS MUESTRAS ============ */
+    .muestras-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 30px 20px;
+        border-bottom: 1px solid var(--fb-border);
+    }
+
+    .muestras-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--fb-card);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .muestras-header {
+        background: linear-gradient(135deg, var(--fb-green), #16a085);
+        color: white;
+        padding: 20px 25px;
+        text-align: center;
+    }
+
+    .muestras-header h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin: 0 0 5px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .muestras-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .muestras-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .muestra-card {
+        display: flex;
+        gap: 12px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border-left: 4px solid var(--fb-green);
+        transition: all 0.2s ease;
+    }
+
+    .muestra-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 188, 156, 0.2);
+    }
+
+    .muestra-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, var(--fb-green), #16a085);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .muestra-content h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--fb-dark);
+        margin: 0 0 5px 0;
+    }
+
+    .muestra-content p {
+        font-size: 0.85rem;
+        color: var(--fb-gray);
+        margin: 0 0 8px 0;
+        line-height: 1.4;
+    }
+
+    .muestra-meta {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .muestra-precio,
+    .muestra-tiempo {
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .muestra-precio {
+        color: #e67e22;
+    }
+
+    .muestra-tiempo {
+        color: var(--fb-green);
+    }
+
+    .muestras-footer {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .muestras-lugar {
+        font-size: 0.9rem;
+        color: var(--fb-dark);
+    }
+
+    .muestras-lugar i {
+        color: #e74c3c;
+    }
+
+    .btn-descargar-docx {
+        background: linear-gradient(135deg, #2980b9, #3498db);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(41, 128, 185, 0.3);
+    }
+
+    .btn-descargar-docx:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(41, 128, 185, 0.4);
+        color: white;
+    }
+
+    /* Responsive para muestras */
+    @media (max-width: 768px) {
+        .muestras-section {
+            padding: 20px 10px;
+        }
+
+        .muestras-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 15px;
+        }
+
+        .muestras-header h2 {
+            font-size: 1.2rem;
+        }
+
+        .muestras-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .btn-descargar-docx {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>
 
 <!-- COVER IMAGE - CERRO CON PUNTA VISIBLE - CLICK PARA VER COMPLETA -->
@@ -384,6 +563,80 @@
                 <i class="fas fa-images"></i> Fotos
             </a>
         </nav>
+    </div>
+</div>
+
+<!-- SECCIÓN: SOBRE LAS MUESTRAS -->
+<div class="muestras-section">
+    <div class="muestras-container">
+        <div class="muestras-header">
+            <h2><i class="fas fa-dna"></i> Sobre las Muestras de ADN (Laboratorios Pérez)</h2>
+            <p class="muestras-subtitle">Opciones disponibles para pruebas de paternidad</p>
+        </div>
+
+        <div class="muestras-grid">
+            <!-- Opción 1: Sangre -->
+            <div class="muestra-card">
+                <div class="muestra-icon"><i class="fas fa-tint"></i></div>
+                <div class="muestra-content">
+                    <h3>Sangre (micro-muestra)</h3>
+                    <p>6 gotitas por pinchazo en pulpa del dedo</p>
+                    <div class="muestra-meta">
+                        <span class="muestra-precio"><i class="fas fa-tag"></i> 2500 Bs</span>
+                        <span class="muestra-tiempo"><i class="fas fa-clock"></i> 7 días hábiles</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opción 2: Hisopado bucal -->
+            <div class="muestra-card">
+                <div class="muestra-icon"><i class="fas fa-teeth"></i></div>
+                <div class="muestra-content">
+                    <h3>Hisopado bucal</h3>
+                    <p>Tomado del Padre y del Niñ@</p>
+                    <div class="muestra-meta">
+                        <span class="muestra-precio"><i class="fas fa-tag"></i> 2500 Bs</span>
+                        <span class="muestra-tiempo"><i class="fas fa-clock"></i> 7 días hábiles</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opción 3: Cabello + sangre -->
+            <div class="muestra-card">
+                <div class="muestra-icon"><i class="fas fa-cut"></i></div>
+                <div class="muestra-content">
+                    <h3>Cabello + sangre</h3>
+                    <p>10 cabellitos del Niñ@ arrancados con raíz (no cortados) + sangre del Padre</p>
+                    <div class="muestra-meta">
+                        <span class="muestra-precio"><i class="fas fa-tag"></i> 3500 Bs</span>
+                        <span class="muestra-tiempo"><i class="fas fa-clock"></i> 7 días hábiles</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opción 4: Uñitas + sangre -->
+            <div class="muestra-card">
+                <div class="muestra-icon"><i class="fas fa-hand-paper"></i></div>
+                <div class="muestra-content">
+                    <h3>Uñitas + sangre</h3>
+                    <p>5 pedazos de uñitas del Niñ@ (mano o pie, indistinto) + sangre del Padre</p>
+                    <div class="muestra-meta">
+                        <span class="muestra-precio"><i class="fas fa-tag"></i> 3500 Bs</span>
+                        <span class="muestra-tiempo"><i class="fas fa-clock"></i> 7 días hábiles</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="muestras-footer">
+            <div class="muestras-lugar">
+                <i class="fas fa-map-marker-alt"></i> <strong>Lugar:</strong> Oficinas de Laboratorios Pérez
+            </div>
+            <a href="{{ url_for('static', filename='uploads/docs/pruebas_adn_perez.docx') }}" class="btn-descargar-docx"
+                download>
+                <i class="fas fa-file-word"></i> Descargar información (DOCX)
+            </a>
+        </div>
     </div>
 </div>
 
